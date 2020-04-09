@@ -9,79 +9,9 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    design: { // 编辑器数据
-      data: {
-        templateMax: 1,
-        componentsMax: 0,
-        nav: {
-          hide: false,
-          navMax: 2,
-          list: [
-            {
-              id: 'nav-1',
-              name: '首页',
-              icon: {
-                id: 'home',
-                label: '首页',
-                unChecked: 'icon-home',
-                checked: 'icon-home-s'
-              },
-              event: {
-                id: 'home',
-                type: '',
-                label: '',
-                url: ''
-              }
-            }, {
-              id: 'nav-2',
-              name: '我的',
-              icon: {
-                id: 'user',
-                label: '我的',
-                unChecked: 'icon-user',
-                checked: 'icon-user-s'
-              },
-              event: {
-                id: 'userCenter',
-                type: '',
-                label: '',
-                url: ''
-              }
-            }
-          ]
-        }
-      },
-      template: {
-        'userCenter': {
-          setting: {
-            "name": "个人中心【系统页面】",
-            "pageBgColor": "#FFFFFF",
-            "navBgColor": "#FFFFFF",
-            "navTitColor": "black",
-            "shareDescribe": "",
-            "shareImage": ""
-          },
-          data: []
-        },
-
-      },
-      group: {
-        
-        system: [
-          'userCenter'
-        ],
-        custom: {
-          'template-1': [
-            'template-2',
-            'template-3'
-          ],
-          'template-4': [
-            'template-5',
-            'template-6'
-          ],
-        }
-      }
-    },
+    design: {}, // 编辑器数据
+    designEditID: '', // 编辑器 当前编辑页面的id
+    designEditIndex: '',  //// 编辑器 当前页面编辑的组件的index
     editorList: [], // 当前页面数据
     editorIndex: '',  // 当前页面编辑的组件 index
     editorNav: [],  // 底部导航数据
@@ -108,7 +38,39 @@ export default new Vuex.Store({
     },
     editorPageData: []  // 全部页面数据
   },
+  getters: {
+    designEditData: (state) => {
+      return state.design.template[state.designEditID]
+    }
+  },
   mutations: {
+    CHANGE_DESIGN(state, val) {
+      state.design = val;
+    },
+    CHANGE_DESIGN_DATA(state, val) {
+      state.design.data[val.key] = val.data;
+    },
+    CHANGE_DESIGN_NAV(state, val) {
+      state.design.data.nav = val;
+    },
+    CHANGE_DESIGN_TEMPLATE(state, val) {
+      state.design.template[val.key] = val.data;
+    },
+    DELETE_DESIGN_TEMPLATE(state, val) {
+      delete state.design.template[val];
+    },
+    CHANGE_DESIGN_GROUP(state, val) {
+      state.design.group = val;
+    },
+    CHANGE_DESIGN_EDIT_ID (state, val) {
+      state.designEditID = val;
+    },
+    CHANGE_DESIGN_EDIT_INDEX (state, val) {
+      state.designEditIndex = val;
+    },
+    CHANGE_DESIGN_TEMPLATE_MAX(state, val) {
+      state.design.data.templateMaxID = val;
+    },
     CHANGE_EDITOR_LIST(state, newVal) {
       state.editorList = newVal
       // let val = deepClone(newVal);

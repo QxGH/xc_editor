@@ -123,7 +123,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["editorList", "editorIndex"])
+    ...mapState(["design", "designEditID", "editorList", "editorIndex"])
   },
   components: {
     vuescroll
@@ -140,17 +140,35 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["CHANGE_EDITOR_LIST"]),
+    ...mapMutations(["CHANGE_DESIGN_TEMPLATE", "CHANGE_EDITOR_LIST"]),
     changeHandle() {
-      let editorList = this.editorList;
-      let editorIndex = this.editorIndex;
+      let design = this.design;
+      let templateSetting = design.template[this.designEditID].setting
+      let templateData = design.template[this.designEditID].data;
       let setting = this.textSetting;
-      editorList[editorIndex].setting.children[
+      templateData[this.editorIndex].setting.children[
         this.settingFreeComponentIndex
       ].setting = setting;
 
-      this.CHANGE_EDITOR_LIST(editorList);
-      this.tellParent();
+      let template = {
+        key: this.designEditID,
+        data: {
+          setting: templateSetting,
+          data: templateData
+        }
+      };
+      this.CHANGE_DESIGN_TEMPLATE(template);
+
+
+      // let editorList = this.editorList;
+      // let editorIndex = this.editorIndex;
+      // let setting = this.textSetting;
+      // editorList[editorIndex].setting.children[
+      //   this.settingFreeComponentIndex
+      // ].setting = setting;
+
+      // this.CHANGE_EDITOR_LIST(editorList);
+      // this.tellParent();
     },
     toBold() {
       let bold = this.setting.style.bold;

@@ -1,6 +1,8 @@
 .free-text-setting {
   .el-collapse-item__header {
     padding-left: 16px;
+    font-size: 14px;
+    color: #666;
     &.is-active {
       border-bottom-color: #EBEEF5;
     }

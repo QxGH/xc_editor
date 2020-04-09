@@ -24,6 +24,14 @@
 .page-manage .handle-opt {
   display: inline-block;
   color: #666;
+  vertical-align: middle;
+}
+
+.page-manage .custom-item .handle-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130px;
 }
 
 .page-manage .handle-name .tips {

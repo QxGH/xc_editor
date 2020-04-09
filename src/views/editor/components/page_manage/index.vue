@@ -2,9 +2,9 @@
   <div class="page-manage">
     <div class="page-list">
       <vuescroll>
-      <template v-for="(item, index) in editorPageData">
-        <div class="group-item" :key="item.id">
-          <div class="handle-box clearfix" @click="changePageHandel(item, {}, 'parent')">
+      <template v-for="(item, index) in design.group.custom">
+        <div class="group-item custom-item" :key="item.id">
+          <div class="handle-box clearfix" @click.stop="changePageHandel(item)">
             <div
               class="handle-icon"
               v-show="item.children.length > 0"
@@ -19,11 +19,11 @@
             </div>
             <div
               class="handle-name"
-              :class="{'active': editorCurrentPage.parent == item.id && !editorCurrentPage.children }"
-            >{{item.setting.name}}</div>
+              :class="{'active': designEditID == item.id }"
+            >{{item.name}}</div>
             <div class="handle-opt" @click.stop>
-              <i class="el-icon-plus icon" @click.stop="addPage(item.id, item)"></i>
-              <i class="el-icon-document-copy icon" @click.stop="copyParent(item.id)"></i>
+              <i class="el-icon-plus icon" @click.stop="addPage(index)"></i>
+              <i class="el-icon-document-copy icon" @click.stop="copyParent(item, index)"></i>
               <el-dropdown
                 @command="((command) => { parentOptCommand(command, index, item) })"
                 trigger="click"
@@ -41,21 +41,21 @@
               <template v-for="(childrenItem, childrenIndex) in item.children">
                 <li
                   class="handle-box clearfix"
-                  @click="changePageHandel(item, childrenItem, 'children')"
+                  @click.stop="changePageHandel(childrenItem)"
                   :key="childrenItem.id"
                 >
                   <div
                     class="handle-name"
-                    :class="{'active': editorCurrentPage.children == childrenItem.id}"
-                  >{{childrenItem.setting.name}}</div>
+                    :class="{'active': designEditID == childrenItem.id}"
+                  >{{childrenItem.name}}</div>
                   <div class="handle-opt" @click.stop>
                     <i
                       class="el-icon-document-copy icon"
-                      @click.stop="copyChildren(item, childrenItem)"
+                      @click.stop="copyChildren(item, childrenItem, index)"
                     ></i>
                     <el-dropdown
                       @click.stop
-                      @command="((command) => { childrenOptCommand(command, childrenIndex, item, childrenItem) })"
+                      @command="((command) => { childrenOptCommand(command, childrenIndex, item, childrenIndex, childrenItem) })"
                       trigger="click"
                     >
                       <i class="el-icon-more icon"></i>
@@ -100,7 +100,7 @@ import Move from "./components/move";
 export default {
   name: "PageManage",
   computed: {
-    ...mapState(["editorPageData", "editorCurrentPage"])
+    ...mapState(["design", "designEditID", "editorPageData", "editorCurrentPage"])
   },
   components: {
     Move,
@@ -126,6 +126,12 @@ export default {
   },
   methods: {
     ...mapMutations([
+      "CHANGE_DESIGN_EDIT_ID",
+      "CHANGE_DESIGN_TEMPLATE",
+      "CHANGE_DESIGN_TEMPLATE_MAX",
+      "CHANGE_DESIGN_GROUP",
+      "DELETE_DESIGN_TEMPLATE",
+
       "CHANGE_EDITOR_LIST",
       "CHANGE_EDITOR_CURRENT_PAGE",
       "CHANGE_EDITOR_PAGE_DATA",
@@ -138,211 +144,160 @@ export default {
         this.dropDownActive = id;
       }
     },
-    changePageHandel(item, childrenItem, type) {
-      let isCurrentPage = false;
+    changePageHandel(item) {
+      this.CHANGE_DESIGN_EDIT_ID(item.id);
 
-      let editorPageData = deepClone(this.editorPageData);
-      let editorCurrentPage = deepClone(this.editorCurrentPage);
-
-      if (type == "parent") {
-        if (item.id == editorCurrentPage.parent) {
-          isCurrentPage = true;
-        }
-      } else if (type == "children") {
-        if (childrenItem.id == editorCurrentPage.children) {
-          isCurrentPage = true;
-        }
-      }
-
-      if (
-        this.editorCurrentPage.type &&
-        this.editorCurrentPage.parent &&
-        !isCurrentPage
-      ) {
-        this.changePage(item, childrenItem, type);
-        // this.$confirm("请确认已保存当前页面, 是否继续?", "提示", {
-        //   confirmButtonText: "确定",
-        //   cancelButtonText: "取消",
-        //   type: "warning"
-        // })
-        //   .then(() => {
-        //     this.changePage(item, childrenItem, type);
-        //   })
-        //   .catch(() => {
-        //     this.$message.info("已取消！");
-        //   });
-      } else {
-        this.changePage(item, childrenItem, type);
-      }
+      this.$emit('changePage', true)
     },
-    changePage(item, childrenItem, type) {
-      let pageSetting = {};
-      let editorList = [];
-      let editorNav = [];
-      if (type == "parent") {
-        editorList = item.data;
-        editorNav = item.nav;
-        pageSetting = item.setting;
-      } else if (type == "children") {
-        editorList = childrenItem.data;
-        editorNav = childrenItem.nav;
-        pageSetting = childrenItem.setting;
-      }
-      let editorCurrentPage = {
-        type,
-        parent: item.id,
-        children: childrenItem.id ? childrenItem.id : "",
-        setting: pageSetting
-      };
-      this.CHANGE_EDITOR_CURRENT_PAGE(editorCurrentPage);
-      this.CHANGE_NAVBAR_LIST(editorNav);
-      this.CHANGE_EDITOR_LIST(editorList);
-      this.$emit("changePage", editorList);
-
-      this.$message.success("切换成功！");
-    },
-    addPage(id, item = {}) {
+    addPage(index) {
       // 新建页面
-      let obj = {
-        id: uuidV4(),
-        setting: {
-          name: '新建页面',
-          pageBgColor: '#FFFFFF',
-          navBgColor: '#FFFFFF',
-          navTitColor: 'black', // black / white
-          shareDescribe: '', // 页面分享描述
-          shareImage: ''  // 页面分享图片
-        },
-        data: [],
-        nav: []
+      let id = this.design.data.templateMaxID + 1;
+      let template = {
+        key: 'template-' + id,
+        data: {
+          setting: {
+            "name": "新建页面",
+            "pageBgColor": "#FFFFFF",
+            "navBgColor": "#FFFFFF",
+            "navTitColor": "black",
+            "shareDescribe": "",
+            "shareImage": ""
+          },
+          data: []
+        }
       };
-      let editorPageData = this.editorPageData;
-      // 添加到父级
-      if (id) {
-        for (let item of editorPageData) {
-          if (item.id == id) {
-            item.children.push(obj);
-            break;
-          }
-        };
+      this.CHANGE_DESIGN_TEMPLATE(template);
+      this.CHANGE_DESIGN_TEMPLATE_MAX(id);
 
-        this.dropDownActive = id;
-        let editorCurrentPage = {
-          type: "children",
-          parent: id,
-          children: obj.id,
-          setting: obj.setting
-        };
-        console.log("editorCurrentPage");
-        console.log(editorCurrentPage);
-        this.CHANGE_EDITOR_CURRENT_PAGE(editorCurrentPage);
-        this.CHANGE_EDITOR_LIST([]);
-        this.changePageHandel(item, obj, "children");
+      let group = this.design.group;
+      let groupObj = {
+        id: 'template-' + id,
+        name: template.data.setting.name
+      };
+      if(index !== '') {
+        group.custom[index].children.push(groupObj)
       } else {
-        // 添加到子级
-        obj.children = [];
-        editorPageData.push(obj);
-        this.changePageHandel(obj, {}, "parent");
-      }
-
-      this.CHANGE_EDITOR_PAGE_DATA(editorPageData);
+        groupObj.children = []
+        group.custom.push(groupObj)
+      };
+      this.CHANGE_DESIGN_GROUP(group)
     },
-    copyParent(id) {
-      // 赋值父级页面
-      let editorPageData = this.editorPageData;
-      let obj = {};
-      for (let item of editorPageData) {
-        if (item.id == id) {
-          obj = deepClone(item);
-          obj.id = uuidV4();
-          break;
-        }
-      }
-      // 替换id
-      if (obj.children.length > 0) {
-        for (let i of obj.children) {
-          i.id = uuidV4();
-        }
-      }
+    copyParent(item, index) {
+      // 复制父级页面
+      let templateMaxID = this.design.data.templateMaxID;
+      let design = this.design;
+      let item_ = deepClone(item);
+      let group = this.design.group;
+      let groupObj = {};  // 分组
 
-      editorPageData.push(obj);
-      this.CHANGE_EDITOR_PAGE_DATA(editorPageData);
+
+      // 先复制父级
+      templateMaxID++;
+      let newParentTemplate = deepClone(design.template[item_.id]);
+      let template = {
+        key: 'template-' + templateMaxID,
+        data: newParentTemplate
+      };
+      this.CHANGE_DESIGN_TEMPLATE(template);
+      
+      groupObj = {
+        id: 'template-' + templateMaxID,
+        name: item_.name + '-副本',
+        children: []
+      };
+
+      if(item_.children.length > 0) {
+        for(let i of item_.children) {
+          templateMaxID++;
+          let newChildrenTemplate = deepClone(design.template[i.id]);
+          let template_ = {
+            key: 'template-' + templateMaxID,
+            data: newChildrenTemplate
+          };
+          this.CHANGE_DESIGN_TEMPLATE(template_);
+          groupObj.children.push({
+            id: 'template-' + templateMaxID,
+            name: i.name + '-副本',
+          })
+        }
+      };
+      group.custom.push(groupObj)
+      this.CHANGE_DESIGN_TEMPLATE_MAX(templateMaxID);
+      this.CHANGE_DESIGN_GROUP(group)
     },
-    copyChildren(item, childrenItem) {
+    copyChildren(item, childrenItem, index) {
       // 复制子级页面
-      let editorPageData = this.editorPageData;
-      let obj = {};
-      for (let i of editorPageData) {
-        if (i.id == item.id) {
-          for (let j of item.children) {
-            if (j.id == childrenItem.id) {
-              obj = deepClone(j);
-              obj.id = uuidV4();
-              break;
-            }
-          }
-          i.children.push(obj);
-          break;
-        }
-      }
-      this.CHANGE_EDITOR_PAGE_DATA(editorPageData);
+      let templateMaxID = this.design.data.templateMaxID;
+      let design = this.design;
+      let childrenItem_ = deepClone(childrenItem);
+      let group = this.design.group;
+      let groupObj = {};  // 分组
+
+      templateMaxID++;
+      let newTemplate = deepClone(design.template[childrenItem_.id]);
+      let template = {
+        key: 'template-' + templateMaxID,
+        data: newTemplate
+      };
+      this.CHANGE_DESIGN_TEMPLATE(template);
+      
+      groupObj = {
+        id: 'template-' + templateMaxID,
+        name: childrenItem_.name + '-副本'
+      };
+      group.custom[index].children.push(groupObj);
+      this.CHANGE_DESIGN_TEMPLATE_MAX(templateMaxID);
+      this.CHANGE_DESIGN_GROUP(group)
     },
     parentOptCommand(command, index, item) {
+      // 父级 删除 或 移动
+
       let editorPageData = this.editorPageData;
       if (command == "del") {
-        editorPageData.splice(index, 1);
-        if (item.id == this.editorCurrentPage.parent) {
-          // 如果删掉的是当前编辑页面的父级 重置当前页数据
-          let editorCurrentPage = {
-            type: "parent",
-            parent: "",
-            children: "",
-            setting: {}
-          };
-          this.CHANGE_EDITOR_CURRENT_PAGE(editorCurrentPage);
-          this.CHANGE_EDITOR_LIST([]);
-        }
-        this.CHANGE_EDITOR_PAGE_DATA(editorPageData);
-        this.$emit("refreshState", "");
+        // 如果删除的是当前页面
+        if(this.designEditID == item.id) {
+          this.CHANGE_DESIGN_EDIT_ID(' ')
+        };
+        // 删除摸板
+        this.DELETE_DESIGN_TEMPLATE(item.id);
+        // 删除分组
+        let group = this.design.group;
+        group.custom.splice(index, 1);
+        this.CHANGE_DESIGN_GROUP(group);
+
       } else if (command == "move") {
         this.moveParams = {
           type: "parent",
           parentID: item.id,
           childrenID: "",
-          name: item.setting.name
+          name: item.name,
+          index
         };
         this.showMoveDialog = true;
       }
     },
-    childrenOptCommand(command, index, item, childrenItem) {
+    childrenOptCommand(command, index, item, childrenIndex, childrenItem) {
       let editorPageData = this.editorPageData;
       if (command == "del") {
-        for (let i of editorPageData) {
-          if (i.id == item.id) {
-            let spliceID = deepClone(i.children[index].id);
-            i.children.splice(index, 1);
-            if (spliceID == this.editorCurrentPage.children) {
-              // 如果删掉的是当前编辑页面
-              let editorCurrentPage = {
-                type: "children",
-                parent: "",
-                children: "",
-                setting: {}
-              };
-              this.CHANGE_EDITOR_CURRENT_PAGE(editorCurrentPage);
-              this.CHANGE_EDITOR_LIST([]);
-            }
-            break;
-          }
-        }
-        this.CHANGE_EDITOR_PAGE_DATA(editorPageData);
-        this.$emit("refreshState", "");
+        // 如果删除的是当前页面
+        if(this.designEditID == childrenItem.id) {
+          this.CHANGE_DESIGN_EDIT_ID(' ')
+        };
+        // 删除摸板
+        this.DELETE_DESIGN_TEMPLATE(childrenItem.id);
+        // 删除分组
+        let group = this.design.group;
+        group.custom[index].children.splice(childrenIndex, 1);;
+        this.CHANGE_DESIGN_GROUP(group);
+
       } else if (command == "move") {
         this.moveParams = {
           type: "children",
           parentID: item.id,
           childrenID: childrenItem.id,
-          name: childrenItem.setting.name
+          name: childrenItem.name,
+          index,
+          childrenIndex
         };
         this.showMoveDialog = true;
       }
@@ -358,42 +313,18 @@ export default {
         if (newID == oldParams.childrenID) {
           return;
         }
-      }
+      };
 
-      let obj = {};
-      let editorPageData = deepClone(this.editorPageData);
-      // 取出 要移动的 页面数据 后 再删掉
-      for (let [index, item] of editorPageData.entries()) {
-        // 遍历 父级
-        if (item.id == oldParams.parentID) {
-          if (oldParams.type == "parent") {
-            // id 相同 移动的是 父级空页面
-            obj = deepClone(item);
-            editorPageData.splice(index, 1);
-          } else if (oldParams.type == "children") {
-            // 移动的子级 再遍历 children
-            for (let [childIndex, childrenItem] of item.children.entries()) {
-              if (childrenItem.id == oldParams.childrenID) {
-                obj = deepClone(childrenItem);
-                editorPageData[index].children.splice(childIndex, 1);
-                break;
-              }
-            }
-          }
+      let group = this.design.group;
+      let moveObj = deepClone(group.custom[oldParams.index])
+      group.custom.splice(oldParams.index, 1);
+      for(let item of group.custom) {
+        if(item.id === newID) {
+          item.children.push(moveObj);
           break;
-        }
-      }
-
-      // 再遍历 把移动的页面放进去
-      for (let [index, item] of editorPageData.entries()) {
-        // 遍历 父级
-        if (item.id == newID) {
-          item.children.push(obj);
-          break;
-        }
-      }
-
-      this.CHANGE_EDITOR_PAGE_DATA(editorPageData);
+        };
+      };
+      this.CHANGE_DESIGN_GROUP(group)
 
       this.showMoveDialog = false;
     }

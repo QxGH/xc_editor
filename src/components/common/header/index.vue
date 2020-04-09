@@ -27,6 +27,7 @@ export default {
   props: ['asideTabsActive'],
   computed: {
     ...mapState([
+      "designEditID",
       "editorList",
       "editorNav",
       "editorCurrentPage",

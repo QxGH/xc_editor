@@ -1,6 +1,30 @@
 <template>
   <div class="free-omnipotent-setting">
-    <el-divider>点击事件</el-divider>
+    <div class="setting-title">万能热区组件</div>
+    <el-form ref="settingForm" :model="setting" label-width="100px">
+      <el-collapse v-model="activeNames">
+        <el-collapse-item title="模块设置" name="1">
+          <el-form-item label="热区宽度：">
+            <el-input-number v-model="setting.width" @change="changeHandle" controls-position="right" :min="40" :max="375" ></el-input-number>
+          </el-form-item>
+          <el-form-item label="热区高度：">
+            <el-input-number v-model="setting.height" @change="changeHandle" controls-position="right" :min="40" ></el-input-number>
+          </el-form-item>
+          <el-form-item label="点击事件：">
+            <div class="link-selector">
+              <button class="selector-btn" v-show="!setting.link.label">设置点击事件</button>
+              <div class="selector-input-group" v-show="setting.link.label">
+                <input class="selector-input" type="text" v-model="setting.link.label">
+                <button class="clear-btn">
+                  <i class="el-icon-close icon"></i>
+                </button>
+              </div>
+            </div>
+          </el-form-item>
+        </el-collapse-item>
+      </el-collapse>
+    </el-form>
+    <!-- <el-divider>点击事件</el-divider>
     <el-button type="primary" plain @click="selectorLinkHandle">选择链接</el-button>
     <span class="link-tips" v-if="currentLinkObj.label">已设置：{{currentLinkObj.label}}</span>
 
@@ -8,7 +32,7 @@
       v-if="showLinkSelector"
       :linkID="currentLinkID"
       @submitLink="submitLinkHandle"
-    ></LinkSelector>
+    ></LinkSelector> -->
   </div>
 </template>
 
@@ -23,21 +47,11 @@ export default {
     return {};
   },
   computed: {
-    ...mapState(["editorList", "editorIndex"])
+    ...mapState(["design", "designEditID", "editorList", "editorIndex"])
   },
   props: {
     setting: {
-      type: Object,
-      default() {
-        return {
-          link: {
-            id: uuidV4(),
-            type: "",
-            label: "",
-            url: ""
-          }
-        };
-      }
+      type: Object
     },
     settingFreeComponentIndex: {
       type: Number,
@@ -48,6 +62,7 @@ export default {
   },
   data(){
     return {
+      activeNames: '1',
       currentLinkObj: {},
       showLinkSelector: false,  // 是否显示链接选择器
       currentLinkID: "", // 当前选中链接id
@@ -61,19 +76,23 @@ export default {
     this.currentLinkID = this.setting.link.id;
   },
   methods: {
-    ...mapMutations(["CHANGE_EDITOR_LIST"]),
-    colorChange(val) {
-      let editorList = this.editorList;
-      let editorIndex = this.editorIndex;
-      // console.log(this.settingFreeComponentIndex)
-      // let setting = editorList[editorIndex].setting.children[this.settingFreeComponentIndex].setting;
-      // setting.color = val;
-      editorList[editorIndex].setting.children[
+    ...mapMutations(["CHANGE_DESIGN_TEMPLATE", "CHANGE_EDITOR_LIST"]),
+    changeHandle() {
+      let design = this.design;
+      let templateSetting = design.template[this.designEditID].setting
+      let templateData = design.template[this.designEditID].data;
+      templateData[this.editorIndex].setting.children[
         this.settingFreeComponentIndex
-      ].setting.color = val;
-      // editorList[editorIndex].setting = setting;
-      this.CHANGE_EDITOR_LIST(editorList);
-      this.tellParent();
+      ].setting = this.setting;
+
+      let template = {
+        key: this.designEditID,
+        data: {
+          setting: templateSetting,
+          data: templateData
+        }
+      };
+      this.CHANGE_DESIGN_TEMPLATE(template);
     },
     selectorLinkHandle() {
       // this.currentLinkID = id;

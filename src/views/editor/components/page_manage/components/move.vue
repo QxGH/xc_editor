@@ -5,9 +5,9 @@
         <p class="move-tips">【{{moveParams.name}}】页面移动至：</p>
         <el-select v-model="moveID" placeholder="请选择" class="move-selector">
           <el-option
-            v-for="item in editorPageData"
+            v-for="item in design.group.custom"
             :key="item.id"
-            :label="item.setting.name"
+            :label="item.name"
             :value="item.id"
             :disabled="item.id == moveParams.parentID"
           ></el-option>
@@ -33,11 +33,9 @@ export default {
   },
   props: ['moveParams'],
   computed: {
-    ...mapState(['editorPageData'])
+    ...mapState(['design'])
   },
   created(){
-    console.log(this.moveParams)
-    console.log(this.editorPageData)
     this.moveID = this.moveParams.parentID;
   },
   methods: {

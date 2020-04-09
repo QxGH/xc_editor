@@ -1,10 +1,10 @@
 const design = { // 编辑器数据
   data: {
-    templateMax: 1,
-    componentsMax: 0,
+    templateMaxID: 1,
+    componentsMaxID: 0,
     nav: {
       hide: false,
-      navMax: 2,
+      navMaxID: 2,
       list: [
         {
           id: 'nav-1',
@@ -66,11 +66,18 @@ const design = { // 编辑器数据
   },
   group: {
     system: [
-      'userCenter'
+      {
+        id: 'userCenter',
+        name: '个人中心【系统页面】'
+      }
     ],
-    custom: {
-      'template-1': []
-    }
+    custom: [
+      {
+        id: "template-1",
+        name: '新建页面',
+        children: []
+      }
+    ]
   }
 };
 

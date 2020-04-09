@@ -71,7 +71,7 @@
             :disabled="dragDisabled"
           >
             <!-- 页面设置 & 底部菜单设置 start -->
-            <div class="fixed-btn-box" v-show="editorCurrentPage.parent">
+            <div class="fixed-btn-box" v-show="designEditID">
               <button class="btn" @click="pageSettingHandle">
                 <i class="font_family icon-setting"></i>
                 页面设置
@@ -90,7 +90,7 @@
                 <div
                   class="preview-header"
                   @click="pageSettingHandle"
-                  :style="{background: editorCurrentPage.setting.navBgColor, color: editorCurrentPage.setting.navTitColor}"
+                  :style="{backgroundColor: editorCurrentPage.setting.navBgColor, color: editorCurrentPage.setting.navTitColor}"
                 >{{editorCurrentPage.setting.name}}</div>
                 <div class="preview-main" ref="previewMain" :style="{background: editorCurrentPage.setting.pageBgColor}">
                   <transition name="el-fade-in">
@@ -134,7 +134,7 @@
                     <template v-if="!showBlankTips">
                       <draggable
                         class="preview-list"
-                        :list="previewList"
+                        :list="designEditData.data"
                         data-name="previewList"
                         group="normal"
                         element="div"
@@ -143,7 +143,7 @@
                         :disabled="dragDisabled"
                         :scroll="true"
                       >
-                        <template v-for="(item, index) in previewList">
+                        <template v-for="(item, index) in designEditData.data">
                           <div
                             class="preview-list-box"
                             :id="'previewListBox-'+index"
@@ -219,7 +219,7 @@
             <component
               :is="settingComponent"
               @refreshState="refreshVuexState"
-              :setting="previewList[previewIndex].label != 'freeContainer' ? previewList[previewIndex].setting : previewList[previewIndex].setting.children[settingFreeComponentIndex].setting"
+              :setting="designEditData.data[previewIndex].label != 'freeContainer' ? designEditData.data[previewIndex].setting : designEditData.data[previewIndex].setting.children[settingFreeComponentIndex].setting"
               :settingFreeComponentIndex="settingFreeComponentIndex"
             ></component>
           </template>
@@ -262,7 +262,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapGetters, mapMutations } from "vuex";
 
 import draggable from "vuedraggable";
 import uuidV4 from "uuid/v4";
@@ -289,11 +289,13 @@ import NavbarSetting from "@/components/editor_settings/navbar";
 import PageSetting from "@/components/editor_settings/page_setting";
 
 import componentsListConfig from "./componentsList";
+import designConfig from "./designConfig"
 
 export default {
   name: "editor",
   data() {
     return {
+      purpose: 'add', // add / edit 新建模板或者编辑模板
       asideTabsActive: "page", // 侧栏 tabs - page / components
       componentsList: [],
       showBlankTips: true,
@@ -328,11 +330,18 @@ export default {
   },
   computed: {
     ...mapState([
+      "design",
+      "designEditID",
+      "designEditIndex",
+
       "editorList",
       "editorIndex",
       "editorNav",
       "editorCurrentPage",
       "editorPageData"
+    ]),
+    ...mapGetters([
+      "designEditData"
     ]),
     getStoreItem() {
       return this.$store.state.editorList;
@@ -340,6 +349,7 @@ export default {
   },
   created() {
     this.componentsList = this.deepClone(componentsListConfig);
+    this.init();
   },
   watch: {
     getStoreItem() {
@@ -370,26 +380,62 @@ export default {
   },
   methods: {
     ...mapMutations([
+      "CHANGE_DESIGN",
+      "CHANGE_DESIGN_TEMPLATE",
+
       "CHANGE_EDITOR_LIST",
       "CHANGE_EDITOR_INDEX",
       "CHANGE_NAVBAR_LIST",
       "CHANGE_EDITOR_PAGE_DATA"
     ]),
+    init() {
+      if(this.purpose === 'add') {
+        let designConfig_ = this.deepClone(designConfig);
+        this.CHANGE_DESIGN(designConfig_);
+      } else {
+        this.getInitData();
+      };
+    },
+    getInitData() {
+
+    },
     changeTabsHandle(val) {
       // 切换左侧 tabs
+      if(val == 'components' && !this.designEditID) {
+        this.$message.warning('请先选择一个页面');
+        return;
+      }
       this.asideTabsActive = val;
     },
     componentsDel() {
       // 组件删除
-      let editorList = this.deepClone(this.editorList);
-      // let editorIndex = this.deepClone(this.editorIndex);
       let handleIndex = this.handleIndex;
-      editorList.splice(handleIndex, 1);
+
+      let design = this.design;
+      let templateSetting = design.template[this.designEditID].setting
+      let templateData = design.template[this.designEditID].data;
+      templateData.splice(handleIndex, 1);
+
+      let template = {
+        key: this.designEditID,
+        data: {
+          setting: templateSetting,
+          data: templateData
+        }
+      };
+      this.CHANGE_DESIGN_TEMPLATE(template);
+
+      // let editorList = this.deepClone(this.editorList);
+
+      // editorList.splice(handleIndex, 1);
+
+      // this.CHANGE_EDITOR_LIST(editorList);
+      // this.previewList = editorList;
+
       this.previewIndex = "";
       this.CHANGE_EDITOR_INDEX("");
-      this.CHANGE_EDITOR_LIST(editorList);
-      this.previewList = editorList;
-      if(editorList.length === 0) {
+
+      if(this.designEditData.data.length === 0) {
         this.showBlankTips = true; // 显示空白页面提示
       };
       this.componentsHandle.show = false;
@@ -397,28 +443,64 @@ export default {
     },
     componentsToUp() {
       // 组件排序向上
-      let editorList = this.deepClone(this.editorList);
-      // let editorIndex = this.deepClone(this.editorIndex);
       let handleIndex = this.handleIndex;
-      const temp = this.deepClone(editorList[handleIndex]);
-      editorList[handleIndex] = editorList[handleIndex - 1];
-      editorList[handleIndex - 1] = temp;
+
+      let design = this.design;
+      let templateSetting = design.template[this.designEditID].setting
+      let templateData = design.template[this.designEditID].data;
+      // templateData.splice(handleIndex, 1);
+
+      const temp = this.deepClone(templateData[handleIndex]);
+      templateData[handleIndex] = templateData[handleIndex - 1];
+      templateData[handleIndex - 1] = temp;
+
+      let template = {
+        key: this.designEditID,
+        data: {
+          setting: templateSetting,
+          data: templateData
+        }
+      };
+      this.CHANGE_DESIGN_TEMPLATE(template);
+
+
+      // let editorList = this.deepClone(this.editorList);
+      // let editorIndex = this.deepClone(this.editorIndex);
+      
       this.componentsHandle.show = false;
-      this.previewList = editorList;
-      this.CHANGE_EDITOR_LIST(editorList);
+      // this.previewList = editorList;
+      // this.CHANGE_EDITOR_LIST(editorList);
     },
     componentsToDown() {
       // 组件排序向下
-      let editorList = this.deepClone(this.editorList);
-      // let editorIndex = this.deepClone(this.editorIndex);
       let handleIndex = this.handleIndex;
 
-      const temp = this.deepClone(editorList[handleIndex]);
-      editorList[handleIndex] = editorList[handleIndex + 1];
-      editorList[handleIndex + 1] = temp;
+      let design = this.design;
+      let templateSetting = design.template[this.designEditID].setting
+      let templateData = design.template[this.designEditID].data;
+
+      const temp = this.deepClone(templateData[handleIndex]);
+      templateData[handleIndex] = templateData[handleIndex + 1];
+      templateData[handleIndex + 1] = temp;
+
+      let template = {
+        key: this.designEditID,
+        data: {
+          setting: templateSetting,
+          data: templateData
+        }
+      };
+      this.CHANGE_DESIGN_TEMPLATE(template);
+      
+
+      // let editorList = this.deepClone(this.editorList);
+
+      // const temp = this.deepClone(editorList[handleIndex]);
+      // editorList[handleIndex] = editorList[handleIndex + 1];
+      // editorList[handleIndex + 1] = temp;
       this.componentsHandle.show = false;
-      this.previewList = editorList;
-      this.CHANGE_EDITOR_LIST(editorList);
+      // this.previewList = editorList;
+      // this.CHANGE_EDITOR_LIST(editorList);
     },
     handleScroll(vertical, horizontal, nativeEvent) {
       // scroll 滚动事件
@@ -433,6 +515,10 @@ export default {
       this.$forceUpdate();
     },
     changePage(val) {
+
+      if(this.designEditData.data.length > 0) {
+        this.showBlankTips = false; // 隐藏空白页面提示
+      }
       this.settingComponent = "";
       this.previewIndex = "";
       if (val && val.length > 0) {
@@ -441,8 +527,6 @@ export default {
         } else {
           this.settingFreeComponentIndex = "";
         }
-        // 自动执行一次点击事件
-        // this.clickComponent(val[0], 0, "")
       } else {
         this.CHANGE_EDITOR_INDEX("");
       }
@@ -679,12 +763,27 @@ export default {
             }
           }
 
-          editorList.splice(val.newIndex, 0, obj);
-          this.previewList = editorList;
+
+          let design = this.design;
+          let templateSetting = design.template[this.designEditID].setting
+          let templateData = design.template[this.designEditID].data;
+          templateData.splice(val.newIndex, 0, obj);
+
+          let template = {
+            key: this.designEditID,
+            data: {
+              setting: templateSetting,
+              data: templateData
+            }
+          };
+          this.CHANGE_DESIGN_TEMPLATE(template);
+          
+          // editorList.splice(val.newIndex, 0, obj);
+          // this.previewList = editorList;
           this.settingFreeComponentIndex = 0; // 默认选中第一个自由组件
           this.$nextTick(() => {
             this.clickComponent(
-              this.editorList[val.newIndex],
+              this.designEditData.data[val.newIndex],
               val.newIndex,
               ""
             );
@@ -692,7 +791,7 @@ export default {
         } else {
           // 普通组件拖动到普通容器
           // 默认选中
-          this.clickComponent(this.editorList[val.newIndex], val.newIndex, "");
+          this.clickComponent(this.designEditData.data[val.newIndex], val.newIndex, "");
         }
       } else if (val.to.dataset.name === "freePreviewDrag") {
         // 自由组件拖动到自由容器
@@ -759,8 +858,10 @@ export default {
       }
       this.previewList = editorList;
       this.CHANGE_EDITOR_LIST(editorList);
-      if(editorList.length === 0) {
+      if(this.designEditData.data.length === 0) {
         this.showBlankTips = true; // 显示空白页面提示
+      } else {
+        this.showBlankTips = false; // 隐藏空白页面提示
       }
 
     },
@@ -806,11 +907,11 @@ export default {
     freeComponentClick(val) {
       console.log("freeComponentClick");
       // 自由组件被点击时
-      let editorList = this.deepClone(this.editorList);
       let editorIndex = this.editorIndex;
       this.settingFreeComponentIndex = val;
       this.settingComponent =
-        editorList[editorIndex].setting.children[val].settingComponent;
+        this.designEditData.data[editorIndex].setting.children[val].settingComponent;
+        
     },
     fillContainer() {
       // 优化自由组件放置

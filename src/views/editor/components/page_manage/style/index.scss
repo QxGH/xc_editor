@@ -19,6 +19,15 @@
   .handle-opt {
     display: inline-block;
     color: #666;
+    vertical-align: middle;
+  }
+  .custom-item {
+    .handle-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 130px;
+    }
   }
   .handle-name {
     .tips {

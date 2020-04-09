@@ -108,7 +108,7 @@ import uuidV4 from "uuid/v4";
 import draggable from "vuedraggable";
 import vdr from "vue-draggable-resizable-gorkys";
 
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapGetters, mapMutations } from "vuex";
 
 import {
   directive,
@@ -145,7 +145,15 @@ export default {
     contextmenu: directive
   },
   computed: {
-    ...mapState(["editorList", "editorIndex"])
+    ...mapState([
+      "design",
+      "designEditID",
+      "editorList", 
+      "editorIndex"
+    ]),
+    ...mapGetters([
+      "designEditData"
+    ])
   },
   props: ["itemIndex", "setting", "freeGroup"],
   watch: {
@@ -208,7 +216,10 @@ export default {
     };
   },
   methods: {
-    ...mapMutations(["CHANGE_EDITOR_LIST"]),
+    ...mapMutations([
+      "CHANGE_DESIGN_TEMPLATE",
+      "CHANGE_EDITOR_LIST"
+    ]),
     log(evt) {
       console.log("free-container change log");
       // console.log(this.editorList[this.itemIndex].setting.children);
@@ -334,13 +345,29 @@ export default {
       this.windowResizeLater = setTimeout(() => {
         let resizeEvent = new Event("resize");
         window.dispatchEvent(resizeEvent);
-        console.log(h);
-        console.log(this.parentHeight);
-        let editorList = this.deepClone(this.editorList);
-        let editorIndex = this.deepClone(this.editorIndex);
-        editorList[editorIndex].setting.height = h;
-        this.CHANGE_EDITOR_LIST(editorList);
-        this.$emit("refreshState", "");
+        // console.log(h);
+        // console.log(this.parentHeight);
+
+        // let editorList = this.deepClone(this.editorList);
+        // let editorIndex = this.deepClone(this.editorIndex);
+        // editorList[editorIndex].setting.height = h;
+        // this.CHANGE_EDITOR_LIST(editorList);
+        // this.$emit("refreshState", "");
+
+        let design = this.design;
+        let templateSetting = design.template[this.designEditID].setting
+        let templateData = design.template[this.designEditID].data;
+        templateData[this.itemIndex].setting.height = h;
+
+        let template = {
+          key: this.designEditID,
+          data: {
+            setting: templateSetting,
+            data: templateData
+          }
+        };
+        this.CHANGE_DESIGN_TEMPLATE(template);
+
         clearTimeout(this.windowResizeLater);
         this.windowResizeLater = null;
       }, 300);
@@ -516,12 +543,28 @@ export default {
       //   this.submitLater = null;
       // }
       // this.submitLater = setTimeout(() => {
-      let editorList = this.editorList;
-      console.log("editorList[this.itemIndex].setting.children");
-      console.log(this.containerList);
-      editorList[this.itemIndex].setting.children = this.containerList;
-      this.CHANGE_EDITOR_LIST(editorList);
-      this.$emit("refreshState", "");
+
+      // let editorList = this.editorList;
+      // console.log("editorList[this.itemIndex].setting.children");
+      // console.log(this.containerList);
+      // this.design.data[this.itemIndex].setting.children = this.containerList;
+
+      let design = this.design;
+      let templateSetting = design.template[this.designEditID].setting
+      let templateData = design.template[this.designEditID].data;
+      templateData[this.itemIndex].setting.children = this.containerList;
+
+      let template = {
+        key: this.designEditID,
+        data: {
+          setting: templateSetting,
+          data: templateData
+        }
+      };
+      this.CHANGE_DESIGN_TEMPLATE(template);
+
+      // this.CHANGE_EDITOR_LIST(editorList);
+      // this.$emit("refreshState", "");
       //   clearTimeout(this.submitLater);
       //   this.submitLater = null;
       // }, 300);
