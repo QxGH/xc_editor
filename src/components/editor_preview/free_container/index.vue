@@ -1,6 +1,8 @@
 <template>
-  <div class="free-container-wrap">
-    <div class="free-container-title">自由容器</div>
+  <div class="free-container-wrap" :style="{paddingTop: setting.hideName ? '0' : '40px'}">
+    <div class="free-container-title" v-show="!setting.hideName">
+      —— {{setting.name}} ——
+    </div>
     <div class="free-container-main">
       <vdr
         class="free-container"
@@ -67,6 +69,9 @@
                   @mouseout="mouseOutHandle"
                   @mouseup="componentsClick"
                 >
+                  <div class="component-delete" @click.stop="deleteComponent(item, index)">
+                    <i class="el-icon-close icon"></i>
+                  </div>
                   <component
                     :is="item.previewComponent"
                     :setting="item.setting"
@@ -157,19 +162,19 @@ export default {
   },
   props: ["itemIndex", "setting", "freeGroup"],
   watch: {
-    "setting.children": {
+    "setting": {
       immediate: true,
       deep: true,
       handler(val) {
-        console.log("watch - setting.children");
-        console.log(val);
+        let children = val.children;
+        this.parentHeight = parseInt(val.height);
         if (this.watchSettingLater) {
           clearTimeout(this.watchSettingLater);
           this.watchSettingLater = null;
         }
         // this.$nextTick(() => {})
         this.watchSettingLater = setTimeout(() => {
-          let containerList = this.deepClone(val);
+          let containerList = this.deepClone(children);
           this.containerList = containerList;
 
           // 重置 自由容器 自小高度 start
@@ -187,7 +192,38 @@ export default {
           this.watchSettingLater = null;
         }, 100);
       }
-    }
+    },
+    // "setting.children": {
+    //   immediate: true,
+    //   deep: true,
+    //   handler(val) {
+    //     console.log("watch - setting.children");
+    //     console.log(val);
+    //     if (this.watchSettingLater) {
+    //       clearTimeout(this.watchSettingLater);
+    //       this.watchSettingLater = null;
+    //     }
+    //     // this.$nextTick(() => {})
+    //     this.watchSettingLater = setTimeout(() => {
+    //       let containerList = this.deepClone(val);
+    //       this.containerList = containerList;
+
+    //       // 重置 自由容器 自小高度 start
+    //       let maxHeight = 0; // 取当前自由容器最大高度元素
+    //       for (let item of containerList) {
+    //         let itemMaxHeight = item.setting.height + item.setting.y;
+    //         if (maxHeight < itemMaxHeight) {
+    //           maxHeight = itemMaxHeight;
+    //         }
+    //       }
+    //       this.parentMinHeight = maxHeight;
+    //       // 重置 自由容器 自小高度 end
+
+    //       clearTimeout(this.watchSettingLater);
+    //       this.watchSettingLater = null;
+    //     }, 100);
+    //   }
+    // }
   },
   data() {
     return {
@@ -220,6 +256,19 @@ export default {
       "CHANGE_DESIGN_TEMPLATE",
       "CHANGE_EDITOR_LIST"
     ]),
+    deleteComponent(item, index) {
+      let containerList = this.containerList;
+      containerList.splice(index, 1);
+      for (let i = 0; i < containerList.length; i++) {
+        containerList[i].setting.z = i + 1;
+      }
+      this.containerList = containerList;
+      this.$emit('freeDelComponents', '');
+      this.$emit("dragDisabledHandle", false);
+      this.dragDisabled = false;
+      this.submit();
+      this.$message.success("删除成功！");
+    },
     log(evt) {
       console.log("free-container change log");
       // console.log(this.editorList[this.itemIndex].setting.children);
@@ -332,8 +381,11 @@ export default {
         containerList[i].setting.z = i + 1;
       }
       this.containerList = containerList;
-      this.$message.success("删除成功！");
+      this.$emit('freeDelComponents', '');
+      this.$emit("dragDisabledHandle", false);
+      this.dragDisabled = false;
       this.submit();
+      this.$message.success("删除成功！");
     },
     parentResize(x, y, w, h) {
       if (this.windowResizeLater) {

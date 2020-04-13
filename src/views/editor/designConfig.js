@@ -4,7 +4,9 @@ const design = { // 编辑器数据
     componentsMaxID: 0,
     nav: {
       hide: false,
-      navMaxID: 2,
+      navMaxID: 1,
+      unCheckedTextColor: '#333333',
+      checkedTextColor: '#1890FF',
       list: [
         {
           id: 'nav-1',
@@ -15,27 +17,7 @@ const design = { // 编辑器数据
             unChecked: 'icon-home',
             checked: 'icon-home-s'
           },
-          event: {
-            id: 'home',
-            type: '',
-            label: '',
-            url: ''
-          }
-        }, {
-          id: 'nav-2',
-          name: '我的',
-          icon: {
-            id: 'user',
-            label: '我的',
-            unChecked: 'icon-user',
-            checked: 'icon-user-s'
-          },
-          event: {
-            id: 'userCenter',
-            type: '',
-            label: '',
-            url: ''
-          }
+          link: {}
         }
       ]
     }

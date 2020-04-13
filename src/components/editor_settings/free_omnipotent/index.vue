@@ -11,11 +11,15 @@
             <el-input-number v-model="setting.height" @change="changeHandle" controls-position="right" :min="40" ></el-input-number>
           </el-form-item>
           <el-form-item label="点击事件：">
-            <div class="link-selector">
-              <button class="selector-btn" v-show="!setting.link.label">设置点击事件</button>
-              <div class="selector-input-group" v-show="setting.link.label">
-                <input class="selector-input" type="text" v-model="setting.link.label">
-                <button class="clear-btn">
+             <div class="link-selector">
+              <button
+                class="selector-btn"
+                @click="selectorLinkHandle"
+                v-show="!setting.link.name"
+              >设置点击事件</button>
+              <div class="selector-input-group" v-show="setting.link.name">
+                <div class="selector-input">{{setting.link.type + ' | ' +setting.link.name}}</div>
+                <button class="clear-btn" @click="delLinkHandle">
                   <i class="el-icon-close icon"></i>
                 </button>
               </div>
@@ -24,15 +28,12 @@
         </el-collapse-item>
       </el-collapse>
     </el-form>
+    <LinkSelector v-if="showLinkSelector" :link="setting.link" @submitLink="submitLinkHandle"></LinkSelector>
+
     <!-- <el-divider>点击事件</el-divider>
     <el-button type="primary" plain @click="selectorLinkHandle">选择链接</el-button>
     <span class="link-tips" v-if="currentLinkObj.label">已设置：{{currentLinkObj.label}}</span>
-
-    <LinkSelector
-      v-if="showLinkSelector"
-      :linkID="currentLinkID"
-      @submitLink="submitLinkHandle"
-    ></LinkSelector> -->
+-->
   </div>
 </template>
 
@@ -71,10 +72,6 @@ export default {
   components: {
     LinkSelector
   },
-  created(){
-    this.currentLinkObj = this.setting.link;
-    this.currentLinkID = this.setting.link.id;
-  },
   methods: {
     ...mapMutations(["CHANGE_DESIGN_TEMPLATE", "CHANGE_EDITOR_LIST"]),
     changeHandle() {
@@ -94,25 +91,32 @@ export default {
       };
       this.CHANGE_DESIGN_TEMPLATE(template);
     },
+    delLinkHandle() {
+      this.setting.link = {};
+      this.changeHandle();
+    },
     selectorLinkHandle() {
-      // this.currentLinkID = id;
       this.showLinkSelector = true;
     },
     submitLinkHandle(val) {
-      if (val.id && val.type && val.label && val.url) {
-        let editorList = this.editorList;
-        let editorIndex = this.editorIndex;
-        editorList[editorIndex].setting.children[
+      if (val.id) {
+        let design = this.design;
+        let templateSetting = design.template[this.designEditID].setting;
+        let templateData = design.template[this.designEditID].data;
+        templateData[this.editorIndex].setting.children[
           this.settingFreeComponentIndex
         ].setting.link = val;
-        this.currentLinkObj = val;
-        this.CHANGE_EDITOR_LIST(editorList);
-        this.tellParent();
+
+        let template = {
+          key: this.designEditID,
+          data: {
+            setting: templateSetting,
+            data: templateData
+          }
+        };
+        this.CHANGE_DESIGN_TEMPLATE(template);
       }
       this.showLinkSelector = false; // 显示图片选择器
-    },
-    tellParent() {
-      this.$emit("refreshState", "");
     }
   }
 };

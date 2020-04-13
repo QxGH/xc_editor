@@ -1,0 +1,24 @@
+.free-container-setting {
+  .el-collapse-item__header {
+    padding-left: 16px;
+    font-size: 14px;
+    color: #666;
+    &.is-active {
+      border-bottom-color: #EBEEF5;
+    }
+  }
+  .el-collapse-item__arrow {
+    font-size: 16px;
+  }
+  .el-collapse-item__content {
+    padding: 10px 16px;
+  }
+  .el-color-picker {
+    vertical-align: top;
+  }
+  .link-tips {
+    font-size: 14px;
+    color: #999;
+    margin-left: 5px;
+  }
+}

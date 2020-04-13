@@ -1,20 +1,26 @@
 <template>
   <div class="goods-list">
-    <el-row :gutter="15">
-      <template v-for="item of goodsList">
-        <el-col :span="12" :key="item.id">
-          <div class="goods-item">
-            <div class="img-box">
-              <el-image style="width: 100%; height: 100px" :src="item.picture" fit="cover"></el-image>
+    <div class="list-name" v-if="!setting.hideName">—— {{setting.name}} ——</div>
+    <div class="list-box">
+      <el-row :gutter="12">
+        <template v-for="item of goodsList">
+          <el-col :span="12" :key="item.id">
+            <div class="goods-item">
+              <div class="img-box">
+                <el-image style="width: 100%; height: 170px" :src="item.picture" fit="cover"></el-image>
+              </div>
+              <div class="info-box">
+                <div class="goods-name">{{item.name}}</div>
+                <div class="goods-price">
+                  <span class="discount-prize">￥{{item.price}}</span>
+                  <span class="original-price">￥199</span>
+                </div>
+              </div>
             </div>
-            <div class="info-box">
-              <div class="goods-name">{{item.name}}</div>
-              <div class="goods-price">￥{{item.price}}</div>
-            </div>
-          </div>
-        </el-col>
-      </template>
-    </el-row>
+          </el-col>
+        </template>
+      </el-row>
+    </div>
   </div>
 </template>
 
@@ -25,7 +31,7 @@ export default {
   data() {
     return {
       goodsList: []
-    }
+    };
   },
   watch: {
     setting: {
@@ -44,9 +50,9 @@ export default {
   },
   methods: {
     filterList(val) {
-      if(val.numberType == 'custom' && val.chooseMode == 'auto') {
-        this.goodsList = val.autoList.slice(0, val.number);;
-      } else if (val.chooseMode == 'hand') {
+      if (val.numberType == "custom" && val.chooseMode == "auto") {
+        this.goodsList = val.autoList.slice(0, val.number);
+      } else if (val.chooseMode == "hand") {
         this.goodsList = val.handList;
       } else {
         this.goodsList = val.autoList;

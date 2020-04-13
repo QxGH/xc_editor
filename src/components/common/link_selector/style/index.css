@@ -1,5 +1,26 @@
+.link-selector .el-dialog__title {
+  font-size: 16px;
+  color: #333;
+}
+
 .link-selector .el-dialog__body {
   padding: 0 20px;
+}
+
+.link-selector .dialog-footer {
+  display: block;
+  height: 32px;
+  margin-bottom: 30px;
+}
+
+.link-selector .dialog-footer .el-button {
+  padding: 0;
+  width: 120px;
+  height: 32px;
+}
+
+.link-selector .dialog-footer .el-button + .el-button {
+  margin-left: 80px;
 }
 
 .link-selector .list-items {
@@ -13,4 +34,65 @@
 
 .link-selector .link-item:first-child {
   padding-top: 5px;
+}
+
+.link-selector .lingk-table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.link-selector .lingk-table th {
+  height: 40px;
+  line-height: 40px;
+  background: #F8F8F8;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+  text-align: center;
+  padding: 0 15px;
+}
+
+.link-selector .lingk-table th:last-child {
+  text-align: right;
+}
+
+.link-selector .lingk-table th:first-child {
+  text-align: left;
+}
+
+.link-selector .lingk-table.goods td {
+  height: 56px;
+  line-height: 56px;
+}
+
+.link-selector .lingk-table td {
+  height: 48px;
+  line-height: 48px;
+  font-size: 14px;
+  text-align: center;
+  padding: 0 15px;
+}
+
+.link-selector .lingk-table td:last-child {
+  text-align: right;
+}
+
+.link-selector .lingk-table td:first-child {
+  text-align: left;
+}
+
+.link-selector .lingk-table tr:nth-child(even) td {
+  background: #F8F8F8;
+}
+
+.link-selector .lingk-table tr:hover td {
+  background: #f5f7fa;
+}
+
+.link-selector .lingk-table .el-image__error {
+  font-size: 10px;
+}
+
+.link-selector .pagetion-box {
+  text-align: right;
 }

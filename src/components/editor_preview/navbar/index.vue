@@ -1,11 +1,11 @@
 <template>
   <div class="navbar">
     <template v-for="item of setting.list">
-      <div class="nav-item" :key="item.id">
+      <div class="nav-item" :key="item.id" :style="{color: setting.unCheckedTextColor}">
         <span class="icon-box">
-          <i class="iconfont" :class="item.icon"></i>
+          <i class="font_family" :class="item.icon.unChecked"></i>
         </span>
-        <div class="text">{{item.text}}</div>
+        <div class="text">{{item.name}}</div>
       </div>
     </template>
   </div>

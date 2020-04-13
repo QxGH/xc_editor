@@ -20,6 +20,7 @@
   }
   .right-aside {
     border-left: 1px solid #ddd;
+    padding-bottom: 50px;
   }
   .tabs-box {
     height: 100%;
@@ -379,6 +380,13 @@
         border: 0;
         outline: 0;
         background: transparent;
+        padding: 0 8px;
+        line-height: 30px;
+        color: #1890FF;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 14px;
       }
       .clear-btn {
         position: absolute;
@@ -442,5 +450,11 @@
     color:rgba(153,153,153,1);
     vertical-align: text-bottom;
     margin-left: 5px;
+  }
+  .template-name {
+    .el-input {
+      width: calc(100% - 60px);
+      margin-right: 5px;
+    }
   }
 }

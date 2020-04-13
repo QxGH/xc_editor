@@ -23,12 +23,7 @@ const list = [
         align: 'left',  // left center right
         lineHeight: 20
       },
-      link: {
-        id: uuidV4(),
-        type: '',
-        label: '',
-        url: ''
-      },
+      link: {},
       width: 100,
       height: 100,
       x: 0,
@@ -48,12 +43,7 @@ const list = [
     setting: {
       imageID: 'default',
       imageUrl: 'https://qxtodo.com/editor/animation_wallpaper.jpg',
-      link: {
-        id: uuidV4(),
-        type: '',
-        label: '',
-        url: ''
-      },
+      link: {},
       width: 100,
       height: 100,
       x: 0,
@@ -75,13 +65,8 @@ const list = [
       color: '#ffffff',
       bg: '#409eff',
       size: '14',
-      style: 'primary',
-      link: {
-        id: uuidV4(),
-        type: '',
-        label: '',
-        url: ''
-      },
+      style: 'primary', // primary plain primaryRound plainRound
+      link: {},
       width: 100,
       height: 40,
       x: 0,
@@ -99,12 +84,7 @@ const list = [
     version: 1,
     explain: '万能热区是可覆盖在自由容器内的图片、文本组件之上透明区域，可对一张固定的图设置不同区域的跳转。',
     setting: {
-      link: {
-        id: uuidV4(),
-        type: '',
-        label: '',
-        url: ''
-      },
+      link: {},
       width: 100,
       height: 40,
       x: 0,
@@ -118,12 +98,13 @@ const list = [
     type: 'freeContainer',
     icon: 'icon-container',
     previewComponent: 'FreeContainer',
-    settingComponent: '',
+    settingComponent: 'FreeContainerSetting',
     version: 1,
     explain: '自由容器组件内目前仅支持添加文本、图片、按钮及万能热区。',
     setting: {
       height: '300',
       name: '自由容器',
+      hideName: false,
       marginBottom: 16,
       children: []
     }
@@ -139,11 +120,14 @@ const list = [
     explain: '小程序首页宣传图片，添加后在小程序平台自主轮换播放，点击组件最多可添加四张图片，所添加图片可附带链接进行页面跳转，播放间隔时间也可自定义设置。',
     setting: {
       height: '200',
+      interval: 3,
       marginBottom: 16,
       list: [
         {
+          id: uuidV4(),
           imageID: "default",
-          imageUrl: 'https://qxtodo.com/editor/animation_wallpaper.jpg'
+          imageUrl: 'https://qxtodo.com/editor/animation_wallpaper.jpg',
+          link: {}
         }
       ]
     }
@@ -158,6 +142,8 @@ const list = [
     version: 1,
     explain: '用于展示商品，点击组件，右侧编辑框可自定义图片及名称，商品添加可选择自动或手动添加。',
     setting: {
+      name: '商品列表',
+      hideName: false,
       marginBottom: 16,
       style: 'default', // 样式
       chooseMode: 'auto', // 选择方式 hand / auto
@@ -202,12 +188,7 @@ const list = [
           imageID: "default",
           imageUrl: 'https://cdn.qinxus.com/animation_gril_banner_2.jpg',
           title: '标题',
-          link: {
-            id: uuidV4(),
-            type: '',
-            label: '',
-            url: ''
-          }
+          link: {}
         }
       ]
     }

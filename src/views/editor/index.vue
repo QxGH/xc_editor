@@ -9,7 +9,7 @@
         <el-aside width="264px" class="left-aside">
           <div class="tabs-box">
             <div class="tabs-pane" v-show="asideTabsActive === 'page'">
-              <PageManage @refreshState="refreshVuexState" @changePage="changePage"></PageManage>
+              <PageManage @changePage="changePage"></PageManage>
             </div>
             <div class="tabs-pane" v-show="asideTabsActive === 'components'">
               <vuescroll>
@@ -85,14 +85,18 @@
             <div class="preview-wrap">
               <div
                 class="preview"
-                :style="{height: showNavbarDragBox || navbarList.length>0 ? '667px' : '617px'}"
+                :style="{height: showNavbarDragBox && !designNavData.hide ? '667px' : '617px'}"
               >
                 <div
                   class="preview-header"
                   @click="pageSettingHandle"
                   :style="{backgroundColor: editorCurrentPage.setting.navBgColor, color: editorCurrentPage.setting.navTitColor}"
                 >{{editorCurrentPage.setting.name}}</div>
-                <div class="preview-main" ref="previewMain" :style="{background: editorCurrentPage.setting.pageBgColor}">
+                <div
+                  class="preview-main"
+                  ref="previewMain"
+                  :style="{background: editorCurrentPage.setting.pageBgColor}"
+                >
                   <transition name="el-fade-in">
                     <div
                       class="components-handle"
@@ -162,6 +166,7 @@
                               :itemIndex="index"
                               @freeComponentClick="freeComponentClick"
                               @dragDisabledHandle="dragDisabledHandle"
+                              @freeDelComponents="freeDelComponents"
                             ></component>
                           </div>
                         </template>
@@ -169,8 +174,9 @@
                     </template>
                   </vuescroll>
                 </div>
-                <div class="preview-navbar" v-if="showNavbarDragBox">
-                  <draggable
+                <div class="preview-navbar" v-if="showNavbarDragBox && !designNavData.hide">
+                  <Navbar :setting="designNavData"></Navbar>
+                  <!-- <draggable
                     class="preview-navbar-graggable"
                     :list="navbarList"
                     data-name="navbarList"
@@ -205,7 +211,7 @@
                         <i class="el-icon-close"></i>
                       </span>
                     </div>
-                  </template>
+                  </template> -->
                 </div>
               </div>
             </div>
@@ -214,31 +220,33 @@
         <!-- 中间 preview end -->
         <!-- 右侧 setting start -->
         <el-aside width="376px" class="right-aside">
-          <!-- 组件设置 -->
-          <template v-if="settingComponent && previewIndex !== '' && !showPageSetting">
-            <component
-              :is="settingComponent"
-              @refreshState="refreshVuexState"
-              :setting="designEditData.data[previewIndex].label != 'freeContainer' ? designEditData.data[previewIndex].setting : designEditData.data[previewIndex].setting.children[settingFreeComponentIndex].setting"
-              :settingFreeComponentIndex="settingFreeComponentIndex"
-            ></component>
-          </template>
-          <!-- 底部导航组件 设置 -->
-          <template v-if="settingComponent && selectNavbar && !showPageSetting">
-            <component
-              :is="settingComponent"
-              @refreshState="refreshVuexState"
-              :setting="editorCurrentPage.setting"
-            ></component>
-          </template>
-          <!-- 头部 页面设置 -->
-          <template v-if="settingComponent && showPageSetting">
-            <component
-              :is="settingComponent"
-              @refreshState="refreshVuexState"
-              :setting="editorCurrentPage.setting"
-            ></component>
-          </template>
+          <vuescroll>
+            <!-- 组件设置 -->
+            <template v-if="settingComponent && previewIndex !== '' && !showPageSetting">
+              <component
+                :is="settingComponent"
+                @refreshState="refreshVuexState"
+                :setting="settingComponent == 'FreeContainerSetting' ? designEditData.data[previewIndex].setting : designEditData.data[previewIndex].label != 'freeContainer' ? designEditData.data[previewIndex].setting : designEditData.data[previewIndex].setting.children[settingFreeComponentIndex].setting"
+                :settingFreeComponentIndex="settingFreeComponentIndex"
+              ></component>
+            </template>
+            <!-- 底部导航组件 设置 -->
+            <template v-if="settingComponent && selectNavbar && !showPageSetting">
+              <component
+                :is="settingComponent"
+                @refreshState="refreshVuexState"
+                :setting="designNavData"
+              ></component>
+            </template>
+            <!-- 头部 页面设置 -->
+            <template v-if="settingComponent && showPageSetting">
+              <component
+                :is="settingComponent"
+                @refreshState="refreshVuexState"
+                :setting="editorCurrentPage.setting"
+              ></component>
+            </template>
+          </vuescroll>
         </el-aside>
         <!-- 右侧 setting end -->
       </el-container>
@@ -280,6 +288,7 @@ import GraphicNavSetting from "@/components/editor_settings/graphic_nav";
 import GoodsList from "@/components/editor_preview/goods_list";
 import GoodsListSetting from "@/components/editor_settings/goods_list";
 import FreeContainer from "@/components/editor_preview/free_container";
+import FreeContainerSetting from "@/components/editor_settings/free_container";
 import FreeTextSetting from "@/components/editor_settings/free_text";
 import FreeBtnSetting from "@/components/editor_settings/free_btn";
 import FreeOmnipotentSetting from "@/components/editor_settings/free_omnipotent";
@@ -289,13 +298,13 @@ import NavbarSetting from "@/components/editor_settings/navbar";
 import PageSetting from "@/components/editor_settings/page_setting";
 
 import componentsListConfig from "./componentsList";
-import designConfig from "./designConfig"
+import designConfig from "./designConfig";
 
 export default {
   name: "editor",
   data() {
     return {
-      purpose: 'add', // add / edit 新建模板或者编辑模板
+      purpose: "add", // add / edit 新建模板或者编辑模板
       asideTabsActive: "page", // 侧栏 tabs - page / components
       componentsList: [],
       showBlankTips: true,
@@ -319,7 +328,7 @@ export default {
         downShow: true
       },
       freeGroup: "free", // 自由容器 拖动插件组
-      showNavbarDragBox: false, // 是否显示底部导航栏区域
+      showNavbarDragBox: true, // 是否显示底部导航栏区域
       showNavbarHandle: false, // 是否显示nabbar handle
       dragOffsetData: {
         // 拖动时offset数据
@@ -340,9 +349,7 @@ export default {
       "editorCurrentPage",
       "editorPageData"
     ]),
-    ...mapGetters([
-      "designEditData"
-    ]),
+    ...mapGetters(["designEditData", "designNavData"]),
     getStoreItem() {
       return this.$store.state.editorList;
     }
@@ -369,6 +376,7 @@ export default {
     GoodsList,
     GoodsListSetting,
     FreeContainer,
+    FreeContainerSetting,
     FreeTextSetting,
     FreeBtnSetting,
     FreeOmnipotentSetting,
@@ -382,6 +390,7 @@ export default {
     ...mapMutations([
       "CHANGE_DESIGN",
       "CHANGE_DESIGN_TEMPLATE",
+      "CHANGE_DESIGN_EDIT_ID",
 
       "CHANGE_EDITOR_LIST",
       "CHANGE_EDITOR_INDEX",
@@ -389,20 +398,20 @@ export default {
       "CHANGE_EDITOR_PAGE_DATA"
     ]),
     init() {
-      if(this.purpose === 'add') {
+      if (this.purpose === "add") {
         let designConfig_ = this.deepClone(designConfig);
         this.CHANGE_DESIGN(designConfig_);
+        let editID = designConfig_.group.custom[0].id;
+        this.CHANGE_DESIGN_EDIT_ID(editID);
       } else {
         this.getInitData();
-      };
+      }
     },
-    getInitData() {
-
-    },
+    getInitData() {},
     changeTabsHandle(val) {
       // 切换左侧 tabs
-      if(val == 'components' && !this.designEditID) {
-        this.$message.warning('请先选择一个页面');
+      if (val == "components" && !this.designEditID) {
+        this.$message.warning("请先选择一个页面");
         return;
       }
       this.asideTabsActive = val;
@@ -412,7 +421,7 @@ export default {
       let handleIndex = this.handleIndex;
 
       let design = this.design;
-      let templateSetting = design.template[this.designEditID].setting
+      let templateSetting = design.template[this.designEditID].setting;
       let templateData = design.template[this.designEditID].data;
       templateData.splice(handleIndex, 1);
 
@@ -435,9 +444,9 @@ export default {
       this.previewIndex = "";
       this.CHANGE_EDITOR_INDEX("");
 
-      if(this.designEditData.data.length === 0) {
+      if (this.designEditData.data.length === 0) {
         this.showBlankTips = true; // 显示空白页面提示
-      };
+      }
       this.componentsHandle.show = false;
       this.$message.success("删除成功");
     },
@@ -446,7 +455,7 @@ export default {
       let handleIndex = this.handleIndex;
 
       let design = this.design;
-      let templateSetting = design.template[this.designEditID].setting
+      let templateSetting = design.template[this.designEditID].setting;
       let templateData = design.template[this.designEditID].data;
       // templateData.splice(handleIndex, 1);
 
@@ -463,10 +472,9 @@ export default {
       };
       this.CHANGE_DESIGN_TEMPLATE(template);
 
-
       // let editorList = this.deepClone(this.editorList);
       // let editorIndex = this.deepClone(this.editorIndex);
-      
+
       this.componentsHandle.show = false;
       // this.previewList = editorList;
       // this.CHANGE_EDITOR_LIST(editorList);
@@ -476,7 +484,7 @@ export default {
       let handleIndex = this.handleIndex;
 
       let design = this.design;
-      let templateSetting = design.template[this.designEditID].setting
+      let templateSetting = design.template[this.designEditID].setting;
       let templateData = design.template[this.designEditID].data;
 
       const temp = this.deepClone(templateData[handleIndex]);
@@ -491,7 +499,6 @@ export default {
         }
       };
       this.CHANGE_DESIGN_TEMPLATE(template);
-      
 
       // let editorList = this.deepClone(this.editorList);
 
@@ -515,28 +522,30 @@ export default {
       this.$forceUpdate();
     },
     changePage(val) {
-
-      if(this.designEditData.data.length > 0) {
+      if (this.designEditData.data.length > 0) {
         this.showBlankTips = false; // 隐藏空白页面提示
       }
       this.settingComponent = "";
       this.previewIndex = "";
-      if (val && val.length > 0) {
-        if (val[0].label == "freeContainer") {
-          this.settingFreeComponentIndex = 0;
-        } else {
-          this.settingFreeComponentIndex = "";
-        }
-      } else {
-        this.CHANGE_EDITOR_INDEX("");
-      }
+      this.settingFreeComponentIndex = "";
+      this.CHANGE_EDITOR_INDEX("");
+
+      // if (val && val.length > 0) {
+      //   if (val[0].label == "freeContainer") {
+      //     this.settingFreeComponentIndex = 0;
+      //   } else {
+      //     this.settingFreeComponentIndex = "";
+      //   }
+      // } else {
+      //   this.CHANGE_EDITOR_INDEX("");
+      // }
       // 显示 navbar
-      if (this.editorNav && this.editorNav.length > 0) {
-        this.navbarList = this.editorNav;
-        this.showNavbarDragBox = true;
-      }
+      // if (this.editorNav && this.editorNav.length > 0) {
+      //   this.navbarList = this.editorNav;
+      //   this.showNavbarDragBox = true;
+      // }
       this.pageSettingHandle();
-      this.refreshVuexState();
+      // this.refreshVuexState();
     },
     mouseoverHandle() {
       this.componentsHandle.show = true;
@@ -591,10 +600,13 @@ export default {
         if (evt) {
           // dom 点击事件 或者冒泡事件
           console.log("dom 点击事件 或者冒泡事件");
-          if (evt.target.classList.contains("free-preview-list")) {
+          if (
+            evt.target.classList.contains("free-preview-list") ||
+            evt.target.classList.contains("free-container-title")
+          ) {
             // 点击的是 自由容器
             console.log("点击的是 自由容器");
-            this.settingComponent = "";
+            this.settingComponent = item.settingComponent;
           } else {
             // 点击的是 自由组件
             console.log("点击的是 自由组件");
@@ -638,8 +650,11 @@ export default {
         this.settingFreeComponentIndex = ""; // 自由组件 setting index
       }
     },
+    freeDelComponents(val) {
+      this.settingComponent = val;
+    },
     pageSettingHandle() {
-      if (!this.editorCurrentPage.type && !this.editorCurrentPage.parent) {
+      if (!this.designEditID) {
         return;
       }
       // this.selectNavbar = false; // 点击普通组件 取消navbar选中
@@ -649,26 +664,28 @@ export default {
       this.settingComponent = "PageSetting";
     },
     bottomMenuHandle() {
-      if (!this.editorCurrentPage.type && !this.editorCurrentPage.parent) {
-        return;
-      };
+      // if (!this.editorCurrentPage.type && !this.editorCurrentPage.parent) {
+      //   return;
+      // }
       this.selectNavbar = true;
       this.showPageSetting = false; // 隐藏页面设置
-      this.settingComponent = 'NavbarSetting';
+      this.settingComponent = "NavbarSetting";
+      this.showNavbarHandle = true;
 
-    },
-    clickNavbar(item, index) {
-      debugger
-      // 隐藏普通组件handle
-      this.componentsHandle.show = false;
-
-      this.showPageSetting = false; // 隐藏页面设置
-
-      // 显示右侧配置页
-      this.settingComponent = item.settingComponent;
       this.CHANGE_EDITOR_INDEX("");
       this.previewIndex = "";
-      this.selectNavbar = true; // 选中navbar
+    },
+    clickNavbar(item, index) {
+      // 隐藏普通组件handle
+      // this.componentsHandle.show = false;
+
+      // this.showPageSetting = false; // 隐藏页面设置
+
+      // 显示右侧配置页
+      // this.settingComponent = item.settingComponent;
+      this.CHANGE_EDITOR_INDEX("");
+      this.previewIndex = "";
+      // this.selectNavbar = true; // 选中navbar
       // 显示navbar handle
       this.showNavbarHandle = true;
     },
@@ -735,22 +752,17 @@ export default {
         if (val.item.dataset.type === "free") {
           // 自由组件拖动到普通容器
           // newIndex
-          editorList.splice(val.newIndex, 1);
-          let obj = {
-            id: uuidV4(),
-            label: "freeContainer",
-            name: "自由容器",
-            type: "freeContainer",
-            icon: "icon-container",
-            previewComponent: "FreeContainer",
-            settingComponent: "",
-            setting: {
-              height: "300",
-              children: []
-            }
-          };
-
+          // editorList.splice(val.newIndex, 1);
           let componentsList = this.deepClone(componentsListConfig);
+          let obj = {};
+          for (let item of componentsList) {
+            if (item.label == "freeContainer") {
+              obj = item;
+              obj.id = uuidV4();
+              break;
+            }
+          }
+
           for (let item of componentsList) {
             if (item.label == val.item.dataset.label) {
               obj.setting.children = [
@@ -763,11 +775,10 @@ export default {
             }
           }
 
-
           let design = this.design;
-          let templateSetting = design.template[this.designEditID].setting
+          let templateSetting = design.template[this.designEditID].setting;
           let templateData = design.template[this.designEditID].data;
-          templateData.splice(val.newIndex, 0, obj);
+          templateData.splice(val.newIndex, 1, obj);
 
           let template = {
             key: this.designEditID,
@@ -777,7 +788,7 @@ export default {
             }
           };
           this.CHANGE_DESIGN_TEMPLATE(template);
-          
+
           // editorList.splice(val.newIndex, 0, obj);
           // this.previewList = editorList;
           this.settingFreeComponentIndex = 0; // 默认选中第一个自由组件
@@ -791,7 +802,11 @@ export default {
         } else {
           // 普通组件拖动到普通容器
           // 默认选中
-          this.clickComponent(this.designEditData.data[val.newIndex], val.newIndex, "");
+          this.clickComponent(
+            this.designEditData.data[val.newIndex],
+            val.newIndex,
+            ""
+          );
         }
       } else if (val.to.dataset.name === "freePreviewDrag") {
         // 自由组件拖动到自由容器
@@ -805,11 +820,7 @@ export default {
         let dropBoxTop = dropBox.getBoundingClientRect().top;
         let dropBoxLeft = dropBox.getBoundingClientRect().left;
 
-        offsetX =
-          val.originalEvent.x -
-          dropBoxLeft +
-          1 -
-          this.dragOffsetData.x;
+        offsetX = val.originalEvent.x - dropBoxLeft + 1 - this.dragOffsetData.x;
 
         offsetY =
           val.originalEvent.y -
@@ -830,7 +841,15 @@ export default {
           offsetY = val.to.offsetHeight - 100;
         }
 
-        let setting = editorList[editorIndex].setting;
+        let design_ = this.design;
+        let templateSetting_ = this.deepClone(
+          design_.template[this.designEditID].setting
+        );
+        let templateData_ = this.deepClone(
+          design_.template[this.designEditID].data
+        );
+
+        // let templateSetting = editorList[editorIndex].setting;
         let label = val.item.dataset.label;
         for (let item of this.componentsList) {
           if (label === item.label) {
@@ -844,11 +863,21 @@ export default {
             console.log("offsetX, offsetY");
             console.log(offsetX);
             console.log(offsetY);
-            obj.setting.z = setting.children.length + 1;
-            setting.children.push(obj);
+            obj.setting.z =
+              templateData_[editorIndex].setting.children.length + 1;
+            templateData_[editorIndex].setting.children.push(obj);
             break;
           }
         }
+
+        let template_ = {
+          key: this.designEditID,
+          data: {
+            setting: templateSetting_,
+            data: templateData_
+          }
+        };
+        this.CHANGE_DESIGN_TEMPLATE(template_);
       }
       // this.listGroupOption.name = 'normal'
       this.freeGroup = "free";
@@ -856,14 +885,13 @@ export default {
       if (this.navbarList.length <= 0) {
         this.showNavbarDragBox = false;
       }
-      this.previewList = editorList;
-      this.CHANGE_EDITOR_LIST(editorList);
-      if(this.designEditData.data.length === 0) {
+      // this.previewList = editorList;
+      // this.CHANGE_EDITOR_LIST(editorList);
+      if (this.designEditData.data.length === 0) {
         this.showBlankTips = true; // 显示空白页面提示
       } else {
         this.showBlankTips = false; // 隐藏空白页面提示
       }
-
     },
     cloneHandle(obj) {
       console.log("clone obj");
@@ -902,16 +930,16 @@ export default {
     dragDisabledHandle(val) {
       // 自由组件拖动时  禁止其他拖动操作
       this.dragDisabled = val;
-      // console.log(`disabled ${val}`)
+      console.log(`disabled ${val}`)
     },
     freeComponentClick(val) {
       console.log("freeComponentClick");
       // 自由组件被点击时
       let editorIndex = this.editorIndex;
       this.settingFreeComponentIndex = val;
-      this.settingComponent =
-        this.designEditData.data[editorIndex].setting.children[val].settingComponent;
-        
+      this.settingComponent = this.designEditData.data[
+        editorIndex
+      ].setting.children[val].settingComponent;
     },
     fillContainer() {
       // 优化自由组件放置

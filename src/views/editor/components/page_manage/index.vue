@@ -147,7 +147,7 @@ export default {
     changePageHandel(item) {
       this.CHANGE_DESIGN_EDIT_ID(item.id);
 
-      this.$emit('changePage', true)
+      this.$emit('changePage', item)
     },
     addPage(index) {
       // 新建页面

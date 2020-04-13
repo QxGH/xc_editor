@@ -40,7 +40,12 @@ export default new Vuex.Store({
   },
   getters: {
     designEditData: (state) => {
-      return state.design.template[state.designEditID]
+      // 当前编辑页面的数据
+      return state.design.template[state.designEditID];
+    },
+    designNavData: (state) => {
+      // 底部导航数据
+      return state.design.data.nav;
     }
   },
   mutations: {
@@ -52,6 +57,9 @@ export default new Vuex.Store({
     },
     CHANGE_DESIGN_NAV(state, val) {
       state.design.data.nav = val;
+    },
+    CHANGE_DESIGN_NAV_MAX(state, val) {
+      state.design.data.nav.navMaxID = val;
     },
     CHANGE_DESIGN_TEMPLATE(state, val) {
       state.design.template[val.key] = val.data;
@@ -73,30 +81,6 @@ export default new Vuex.Store({
     },
     CHANGE_EDITOR_LIST(state, newVal) {
       state.editorList = newVal
-      // let val = deepClone(newVal);
-      // // 判断是否有值
-      // if(!isUndefined(val) && !isNull(val)) {
-      //   // 判断是否是空数组
-      //   if(Array.isArray(val) && val.length == 0) {
-      //     state.editorList = val
-      //   } else {
-      //     // 不是空数组 对比数据
-      //     let diffRes = diff(state.editorList, val)
-      //     console.log('CHANGE_EDITOR_LIST')
-      //     // console.log(diffRes)
-      //     // console.log(state.editorList)
-      //     // console.log(val)
-      //     // console.log('CHANGE_EDITOR_LIST /')
-      //     if(diffRes) {
-      //       // 赋值改变了的数据
-      //       for(let [index, item] of diffRes.entries()) {
-      //         if(item.length > 1 && val[index]) {
-      //           state.editorList[index] = val[index]
-      //         }
-      //       };
-      //     };
-      //   }
-      // }
     },
     CHANGE_NAVBAR_LIST(state, val) {
       state.editorNav = val;

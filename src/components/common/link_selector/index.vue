@@ -1,26 +1,113 @@
 <template>
   <div class="link-selector">
-    <el-dialog title="链接选择器" :visible.sync="dialogVisible" width="800px">
+    <el-dialog title="设置点击事件" :visible.sync="dialogVisible" width="800px" center>
       <div class="link-selector-body">
         <el-tabs v-model="tabActiveName" @tab-click="tabhandleClick" stretch>
-          <el-tab-pane label="页面" name="page">
-            <ul class="list-items">
-              <template v-for="item in linkList">
-                <li class="link-item" :key="item.id">
-                  <el-radio v-model="currentLink" :label="item.id" @change="radioHandleChange(item)">{{item.label}}</el-radio>
-                </li>
-              </template>
-            </ul>
+          <el-tab-pane label="自定义页面" name="page">
+            <table class="lingk-table" cellpadding="0" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>页面名称</th>
+                  <th>创建时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in linkList.page" :key="item.id">
+                  <td>
+                    <el-radio
+                      v-model="currentLinkID"
+                      :label="item.id"
+                      @change="changeHandle(item)"
+                    >{{item.name}}</el-radio>
+                  </td>
+                  <td>{{item.createdTime}}</td>
+                </tr>
+              </tbody>
+            </table>
           </el-tab-pane>
-          <el-tab-pane label="商品" name="goods">商品</el-tab-pane>
-          <el-tab-pane label="系统页面" name="system">系统页面</el-tab-pane>
-          <el-tab-pane label="其他" name="other">其他</el-tab-pane>
+          <el-tab-pane label="商品" name="goods">
+            <table class="lingk-table goods" cellpadding="0" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>商品信息</th>
+                  <th>商品分类</th>
+                  <th>创建时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in linkList.goods" :key="item.id">
+                  <td>
+                    <el-radio v-model="currentLinkID" :label="item.id" @change="changeHandle(item)">
+                      <el-image
+                        class="v-mid"
+                        style="width: 40px; height: 40px"
+                        :src="item.picture"
+                        fit="contain"
+                      ></el-image>
+                      <span class="v-mid">{{item.name}}</span>
+                    </el-radio>
+                  </td>
+                  <td>{{item.class}}</td>
+                  <td>{{item.createdTime}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </el-tab-pane>
+          <el-tab-pane label="系统页面" name="system">
+            <table class="lingk-table" cellpadding="0" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>页面名称</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in linkList.system" :key="item.id">
+                  <td>
+                    <el-radio
+                      v-model="currentLinkID"
+                      :label="item.id"
+                      @change="changeHandle(item)"
+                    >{{item.name}}</el-radio>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </el-tab-pane>
+          <el-tab-pane label="其他" name="other">
+            <table class="lingk-table" cellpadding="0" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>页面名称</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in linkList.other" :key="item.id">
+                  <td>
+                    <el-radio
+                      v-model="currentLinkID"
+                      :label="item.id"
+                      @change="changeHandle(item)"
+                    >{{item.name}}</el-radio>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </el-tab-pane>
         </el-tabs>
-        <el-pagination background layout="prev, pager, next" :total="1"></el-pagination>
+        <div class="pagetion-box">
+          <el-pagination
+            background
+            :page-size="pageData.size"
+            :current-page="pageData.current"
+            :total="pageData.total"
+            @current-change="pageChange"
+            layout="prev, pager, next"
+          ></el-pagination>
+        </div>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button  @click="close">取 消</el-button>
-        <el-button type="primary"  @click="close">确 定</el-button>
+        <el-button @click="close">取 消</el-button>
+        <el-button type="primary" @click="close">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -31,50 +118,117 @@ import uuidV4 from "uuid/v4";
 
 export default {
   name: "linkSelector",
-  props: ["linkID"],
+  props: ["link"],
   data() {
     return {
-      currentLink: "",
+      currentLinkID: "",
       currentLinkObj: {},
+      pageData: {
+        current: 1,
+        size: 10,
+        total: 0
+      },
       dialogVisible: true,
       tabActiveName: "page",
-      linkList: [
-        {
-          id: uuidV4(),
-          type: "page",
-          label: "页面-1",
-          url: "pages/logs/index-1"
-        },
-        {
-          id: uuidV4(),
-          type: "page",
-          label: "页面-2",
-          url: "pages/logs/index-2"
-        },
-        {
-          id: uuidV4(),
-          type: "page",
-          label: "页面-3",
-          url: "pages/logs/index-3"
-        },
-        {
-          id: uuidV4(),
-          type: "page",
-          label: "页面-4",
-          url: "pages/logs/index-4"
-        }
-      ]
+      linkList: {
+        page: [
+          {
+            id: "page-1",
+            type: "page",
+            name: "页面-1",
+            url: "pages/logs/index-1",
+            createdTime: "2020-12-29 23:23:23"
+          },
+          {
+            id: "page-2",
+            type: "page",
+            name: "页面-2",
+            url: "pages/logs/index-1",
+            createdTime: "2020-12-29 23:23:23"
+          },
+          {
+            id: "page-3",
+            type: "page",
+            name: "页面-3",
+            url: "pages/logs/index-1",
+            createdTime: "2020-12-29 23:23:23"
+          }
+        ],
+        goods: [
+          {
+            id: "goods-1",
+            type: "goods",
+            name: "商品-1",
+            picture: "",
+            class: "商品分类",
+            url: "pages/logs/index-1",
+            createdTime: "2020-12-29 23:23:23"
+          },
+          {
+            id: "goods-2",
+            type: "goods",
+            name: "商品-2",
+            picture: "",
+            class: "商品分类",
+            url: "pages/logs/index-1",
+            createdTime: "2020-12-29 23:23:23"
+          }
+        ],
+        system: [
+          {
+            id: "system-1",
+            type: "system",
+            name: "系统-1",
+            url: "pages/logs/index-1"
+          },
+          {
+            id: "system-2",
+            type: "system",
+            name: "系统-2",
+            url: "pages/logs/index-1"
+          },
+          {
+            id: "system-3",
+            type: "system",
+            name: "系统-3",
+            url: "pages/logs/index-1"
+          }
+        ],
+        other: [
+          {
+            id: "other-1",
+            type: "other",
+            name: "其他-1",
+            url: "pages/logs/index-1"
+          },
+          {
+            id: "other-2",
+            type: "other",
+            name: "其他-2",
+            url: "pages/logs/index-1"
+          },
+          {
+            id: "other-3",
+            type: "other",
+            name: "其他-3",
+            url: "pages/logs/index-1"
+          }
+        ]
+      }
     };
   },
   created() {
-    this.currentLink = this.linkID;
+    this.currentLinkID = this.link.id ? this.link.id : '';
   },
   methods: {
+    changeHandle(row) {
+      this.currentLinkObj = row;
+    },
+    pageChange(currentPage) {
+      // this.getList(currentPage)
+    },
     tabhandleClick(val) {
       // console.log(val);
-    },
-    radioHandleChange(val) {
-      this.currentLinkObj = val;
     },
     close() {
       this.$emit("submitLink", this.currentLinkObj);

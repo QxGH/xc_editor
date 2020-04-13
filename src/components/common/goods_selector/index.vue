@@ -1,7 +1,24 @@
 <template>
   <div class="goods-selector">
-    <el-dialog title="商品选择器" :visible.sync="dialogVisible" width="800px">
-      <div class="link-selector-body">
+    <el-dialog title="已上架商品" :visible.sync="dialogVisible" width="800px" center>
+      <div class="goods-selector-body">
+        <div class="opt-box clearfix">
+          <div class="pull-left">
+            <el-button type="primary" class="add-btn">新建商品</el-button>
+            <el-button class="refires-btn">刷新</el-button>
+          </div>
+          <div class="pull-right">
+            <el-select v-model="goodsTypeVal" class="group-type-select" placeholder="请选择">
+              <el-option
+                v-for="item in goodsTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+            <el-input placeholder="请输入内容" class="search-input" suffix-icon="el-icon-search" v-model="searchVal"></el-input>
+          </div>
+        </div>
         <el-table
           ref="goodsTable"
           :data="goodsList"
@@ -9,16 +26,26 @@
           style="width: 100%; margin-bottom: 15px;"
           @selection-change="selectionChange"
         >
-          <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column label="picture" width="120">
+          <el-table-column type="selection" width="30"></el-table-column>
+          <el-table-column label="全选" width="60">
             <template slot-scope="scope">
-              <el-image style="width: 80px; height: 60px" :src="scope.row.picture" fit="cover"></el-image>
+              <el-image style="width: 40px; height: 40px" :src="scope.row.picture" fit="cover"></el-image>
             </template>
           </el-table-column>
-          <el-table-column prop="name" label="name"></el-table-column>
-          <el-table-column prop="type" label="type"></el-table-column>
+          <el-table-column prop="name" label="商品信息"></el-table-column>
+          <el-table-column prop="type" label="商品分类"></el-table-column>
+          <el-table-column prop="create" label="创建时间"></el-table-column>
         </el-table>
-        <el-pagination background layout="prev, pager, next" :total="1"></el-pagination>
+        <div class="pagetion-box">
+          <el-pagination
+            background
+            :page-size="pageData.size"
+            :current-page="pageData.current"
+            :total="pageData.total"
+            @current-change="pageChange"
+            layout="prev, pager, next"
+          ></el-pagination>
+        </div>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="close">取 消</el-button>
@@ -36,6 +63,19 @@ export default {
   props: ["goods"],
   data() {
     return {
+      pageData: {
+        current: 1,
+        size: 10,
+        total: 0
+      },
+      goodsTypeOptions: [
+        {
+          value: "all",
+          label: "全部商品"
+        }
+      ],
+      goodsTypeVal: '',
+      searchVal: '',
       goodsList: [],
       currentGoods: [],
       currentGoodsRes: [],
@@ -48,6 +88,9 @@ export default {
   },
   mounted() {},
   methods: {
+    pageChange(currentPage) {
+      // this.getList(currentPage)
+    },
     fillTable() {
       let rows = this.currentGoods;
       if (rows.length > 0) {
