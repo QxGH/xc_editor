@@ -1,0 +1,27 @@
+.graphic-nav {
+  width: 100%;
+  height: 80px;
+  text-align: center;
+  border-top: 1px solid #ddd;
+  display: flex;
+  cursor: pointer;
+  font-size: 0;
+}
+
+.graphic-nav .nav-item {
+  flex: 1;
+  text-align: center;
+  padding-top: 6px;
+}
+
+.graphic-nav .icon-box {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+}
+
+.graphic-nav .title {
+  font-size: 12px;
+  line-height: 17px;
+  margin-top: 3px;
+}

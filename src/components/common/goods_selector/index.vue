@@ -111,7 +111,7 @@ export default {
       }
     },
     getGoodsList() {
-      this.$api.editor.getAllGoodsList().then(res => {
+      this.$api.design.getAllGoodsList().then(res => {
         if (res.data.code === 0) {
           this.goodsList = res.data.data.goodsList;
           this.$nextTick(() => {

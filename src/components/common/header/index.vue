@@ -1,21 +1,37 @@
 <template>
   <div class="header-main clearfix">
-    <!-- <el-button type="primary" @click="fillData">填充数据</el-button>
-    <el-button type="primary" @click="JsonDialog = true">页面数据</el-button>
-    <el-button type="primary" @click="save">保存页面</el-button> -->
     <div class="tabs-btn-box clearfix">
-      <button class="tabs-btn" :class="{'active': asideTabsActive === 'page'}" @click="changeTabs('page')">页面管理</button>
-      <button class="tabs-btn" :class="{'active': asideTabsActive === 'components'}" @click="changeTabs('components')">装修组件</button>
+      <button
+        class="tabs-btn"
+        :class="{'active': asideTabsActive === 'page'}"
+        @click="changeTabs('page')"
+      >页面管理</button>
+      <button
+        class="tabs-btn"
+        :class="{'active': asideTabsActive === 'components'}"
+        @click="changeTabs('components')"
+      >装修组件</button>
     </div>
     <div class="middle">
       主题色
       <i class="el-icon-arrow-right"></i>
     </div>
     <div class="opt-btn-box">
-      <button class="btn blue-btn">保存并预览</button>
+      <button class="btn blue-btn" @click="preview">保存并预览</button>
       <button class="btn white-btn" @click="save">仅保存</button>
       <button class="btn white-btn">返回平台</button>
     </div>
+    <el-dialog title="效果预览" custom-class="preview-dialog" :visible.sync="previewDialog" width="455px" center :modal-append-to-body="false">
+      <div class="dialog-body">
+        <div class="qrcode-box">
+          <img src="" alt="" class="img">
+        </div>
+        <p class="tips">微信扫码预览</p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="previewDialog = false">关  闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -24,59 +40,24 @@ import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "Header",
-  props: ['asideTabsActive'],
+  data() {
+    return {
+      previewDialog: false
+    }
+  },
+  props: ["asideTabsActive"],
   computed: {
-    ...mapState([
-      "designEditID",
-      "editorList",
-      "editorNav",
-      "editorCurrentPage",
-      "editorPageData"
-    ])
+    ...mapState(["designEditID"])
   },
   methods: {
-    ...mapMutations(["CHANGE_EDITOR_PAGE_DATA"]),
     changeTabs(val) {
-      this.$emit('changeTabs', val)
+      this.$emit("changeTabs", val);
     },
-    fillData() {
-      // 填充数据
-      this.$api.editor.getEditor().then(res => {
-        if (res.data.code === 0) {
-          this.CHANGE_EDITOR_PAGE_DATA(res.data.data.list);
-        } else {
-          this.$message.warning("获取数据失败!");
-        }
-      });
+    preview() {
+      this.previewDialog = true;
     },
     save() {
       // 保存页面；
-      let editorPageData = this.deepClone(this.editorPageData);
-      let editorCurrentPage = this.deepClone(this.editorCurrentPage);
-      let editorList = this.deepClone(this.editorList);
-      let editorNav = this.deepClone(this.editorNav);
-      let pageSetting = editorCurrentPage.setting;
-
-      for (let [index, item] of editorPageData.entries()) {
-        if (item.id == editorCurrentPage.parent) {
-          if (editorCurrentPage.type == "parent") {
-            item.data = editorList;
-            item.nav = editorNav;
-            item.setting = pageSetting;
-          } else if (editorCurrentPage.type == "children") {
-            for (let [childIndex, childrenItem] of item.children.entries()) {
-              if (childrenItem.id == editorCurrentPage.children) {
-                childrenItem.data = editorList;
-                childrenItem.nav = editorNav;
-                childrenItem.setting = pageSetting;
-                break;
-              }
-            }
-          }
-          break;
-        }
-      }
-      this.CHANGE_EDITOR_PAGE_DATA(editorPageData);
       this.$message.success("保存成功！");
     },
     deepClone(target) {

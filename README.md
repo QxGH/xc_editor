@@ -1,4 +1,4 @@
-# editor
+# Design
 
 ## Project setup
 ```

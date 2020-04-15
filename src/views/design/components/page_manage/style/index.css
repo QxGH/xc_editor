@@ -1,0 +1,131 @@
+.page-manage {
+  height: 100%;
+}
+
+.page-manage .page-list {
+  height: calc(100% - 120px);
+  overflow-y: hidden;
+}
+
+.page-manage .handle-box {
+  border-bottom: 1px solid #dcdfe6;
+  line-height: 39px;
+  height: 40px;
+  padding: 0 0 0 10px;
+  cursor: pointer;
+}
+
+.page-manage .group-children {
+  padding-left: 16px;
+}
+
+.page-manage .handle-name,
+.page-manage .handle-icon,
+.page-manage .handle-opt {
+  display: inline-block;
+  color: #666;
+  vertical-align: middle;
+}
+
+.page-manage .custom-item .handle-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130px;
+}
+
+.page-manage .handle-name .tips {
+  color: #999;
+}
+
+.page-manage .handle-name.active {
+  color: #2589FF;
+}
+
+.page-manage .handle-name.active .tips {
+  color: #2589FF;
+}
+
+.page-manage .handle-icon .icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.page-manage .handle-opt {
+  float: right;
+  padding-right: 10px;
+}
+
+.page-manage .handle-opt .icon {
+  margin: 0 5px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 32px;
+}
+
+.page-manage .handle-opt .icon:hover {
+  color: #409EFF;
+}
+
+.page-manage .handle-opt .dropdown-box {
+  display: inline-block;
+}
+
+.page-manage ul, .page-manage li {
+  list-style: none;
+}
+
+.page-manage .add-btn-box {
+  padding-top: 20px;
+  margin-bottom: 56px;
+}
+
+.page-manage .add-btn-box .el-button {
+  display: block;
+  margin: 0 auto;
+  width: 232px;
+  height: 32px;
+  padding: 0;
+  line-height: 32px;
+}
+
+.page-manage .system-page-item {
+  padding-top: 8px;
+}
+
+.page-manage-move .el-dialog__title {
+  font-size: 16px;
+  color: #333;
+  font-weight: bold;
+}
+
+.page-manage-move .el-dialog__body {
+  padding: 10px 20px 25px;
+}
+
+.page-manage-move .dialog-body {
+  width: 320px;
+  margin: 0 auto;
+}
+
+.page-manage-move .dialog-body .move-tips {
+  color: #666666;
+  line-height: 20px;
+  height: 20px;
+  margin-bottom: 16px;
+}
+
+.page-manage-move .dialog-body .move-selector {
+  width: 100%;
+}
+
+.page-manage-move .el-dialog__footer {
+  padding-bottom: 40px;
+}
+
+.page-manage-move .dialog-footer .el-button {
+  width: 120px;
+  height: 32px;
+  padding: 0;
+  line-height: 30px;
+}

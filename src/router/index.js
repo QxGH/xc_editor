@@ -6,12 +6,8 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'Editor',
-    component: () => import('../views/editor')
-  }, {
-    path: '/testView',
-    name: 'TestView',
-    component: () => import('../views/testView')
+    name: 'Design',
+    component: () => import('../views/design')
   }
 ]
 

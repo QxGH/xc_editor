@@ -134,21 +134,21 @@ export default {
         page: [
           {
             id: "page-1",
-            type: "page",
+            type: "自定义页面",
             name: "页面-1",
             url: "pages/logs/index-1",
             createdTime: "2020-12-29 23:23:23"
           },
           {
             id: "page-2",
-            type: "page",
+            type: "自定义页面",
             name: "页面-2",
             url: "pages/logs/index-1",
             createdTime: "2020-12-29 23:23:23"
           },
           {
             id: "page-3",
-            type: "page",
+            type: "自定义页面",
             name: "页面-3",
             url: "pages/logs/index-1",
             createdTime: "2020-12-29 23:23:23"
@@ -157,7 +157,7 @@ export default {
         goods: [
           {
             id: "goods-1",
-            type: "goods",
+            type: "商品",
             name: "商品-1",
             picture: "",
             class: "商品分类",
@@ -166,7 +166,7 @@ export default {
           },
           {
             id: "goods-2",
-            type: "goods",
+            type: "商品",
             name: "商品-2",
             picture: "",
             class: "商品分类",
@@ -177,19 +177,19 @@ export default {
         system: [
           {
             id: "system-1",
-            type: "system",
+            type: "系统页面",
             name: "系统-1",
             url: "pages/logs/index-1"
           },
           {
             id: "system-2",
-            type: "system",
+            type: "系统页面",
             name: "系统-2",
             url: "pages/logs/index-1"
           },
           {
             id: "system-3",
-            type: "system",
+            type: "系统页面",
             name: "系统-3",
             url: "pages/logs/index-1"
           }
@@ -197,19 +197,19 @@ export default {
         other: [
           {
             id: "other-1",
-            type: "other",
+            type: "其他",
             name: "其他-1",
             url: "pages/logs/index-1"
           },
           {
             id: "other-2",
-            type: "other",
+            type: "其他",
             name: "其他-2",
             url: "pages/logs/index-1"
           },
           {
             id: "other-3",
-            type: "other",
+            type: "其他",
             name: "其他-3",
             url: "pages/logs/index-1"
           }
@@ -218,7 +218,7 @@ export default {
     };
   },
   created() {
-    this.currentLinkID = this.link.id ? this.link.id : '';
+    this.currentLinkID = this.link ? this.link.id : '';
   },
   methods: {
     changeHandle(row) {

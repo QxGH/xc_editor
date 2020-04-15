@@ -1,10 +1,11 @@
 {
-  "name": "editor",
+  "name": "design",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --open",
-    "build": "vue-cli-service build",
+    "serve": "vue-cli-service serve --open --mode dev",
+    "build:test": "vue-cli-service build --mode test",
+    "build": "vue-cli-service build --mode prod",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -12,7 +13,6 @@
     "core-js": "^3.6.4",
     "element-ui": "^2.13.0",
     "js-cookie": "^2.2.1",
-    "json-diff": "^0.5.4",
     "v-contextmenu": "^2.9.0",
     "vue": "^2.6.11",
     "vue-draggable-resizable-gorkys": "^2.3.6",

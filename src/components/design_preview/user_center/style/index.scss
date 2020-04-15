@@ -1,0 +1,131 @@
+.user-center-preview {
+  min-height: 100%;
+  background: #f8f8f8;
+  position: relative;
+  .top-card {
+    height: 120px;
+    padding: 28px 12px;
+    line-height: 64px;
+    position: relative;
+    .avatar-box {
+      display: block;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      background: #DEDEDE;
+      float: left;
+      .avatar {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+    .user-name {
+      display: block;
+      padding-left: 74px;
+      font-size: 18px;
+      line-height: 64px;
+      color: #fff;
+    }
+  }
+  .order-manage {
+    margin-top: 10px;
+    background: #fff;
+    .order-header {
+      height: 46px;
+      line-height: 46px;
+      padding: 0 23px;
+      border-bottom: 1px solid #F7F7F7;
+      .name {
+        font-size: 15px;
+        float: left;
+      }
+      .look {
+        font-size: 13px;
+        color: #666;
+        float: right;
+        cursor: pointer;
+        .icon {
+          font-size: 16px;
+        }
+      }
+    }
+    .order-body {
+      height: 98px;
+      padding: 0 12px;
+      .item {
+        width: 25%;
+        height: 100%;
+        text-align: center;
+        float: left;
+        padding-top: 22px;
+        cursor: pointer;
+        .icon {
+          display: inline-block;
+          width: 28px;
+          height: 28.5px;
+          background-repeat: no-repeat;
+          background-position: center center;
+        }
+        .name {
+          display: block;
+          font-size: 13px;
+          margin-top: 10px;
+          line-height: 20px;
+          color: #666;
+          font-weight: 400;
+        }
+      }
+    }
+  }
+  .user-list {
+    margin-top: 10px;
+    background: #fff;
+    .item {
+      height: 43px;
+      line-height: 43px;
+      padding: 0 12px;
+      cursor: pointer;
+      &:last-child {
+        .item-box {
+          border-bottom: 0
+        }
+      }
+      .item-box {
+        border-bottom: 1px solid #f7f7f7;
+        padding-left: 7px;
+      }
+      .img-icon {
+        display: inline-block;
+        width: 13px;
+        height: 15px;
+        background-position: center center;
+        background-repeat: no-repeat;
+        vertical-align: middle;
+      }
+      .title {
+        vertical-align: middle;
+        margin-left: 8px;
+        color: #666;
+      }
+      .icon-box {
+        float: right;
+        .icon {
+          font-size: 16px;
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+  .agreement {
+    width: 100%;
+    font-size: 13px;
+    line-height: 20px;
+    color: #999;
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    text-align: center;
+  }
+}
