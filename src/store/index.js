@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import deepClone from '@/tools/deepClone'
 
 Vue.use(Vuex)
 
@@ -12,7 +13,7 @@ export default new Vuex.Store({
   getters: {
     designEditData: (state) => {
       // 当前编辑页面的数据
-      let data = state.design.template[state.designEditID]
+      let data = deepClone(state.design.template[state.designEditID]);
       return data;
     },
     designNavData: (state) => {
@@ -39,6 +40,7 @@ export default new Vuex.Store({
     },
     CHANGE_DESIGN_TEMPLATE(state, val) {
       // 修改模板数据
+      // Vue.set(state.design.template, [val.key], val.data)
       state.design.template[val.key] = val.data;
     },
     CHANGE_DESIGN_TEMPLATE_MAX(state, val) {

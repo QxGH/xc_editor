@@ -230,6 +230,9 @@
           // right: 0;
           // z-index: 19;
           // border: 1px solid #409EFF;
+          border: 1px solid #409EFF;
+        }
+        &.isSelectFree {
           .free-preview-list {
             border: 1px solid #409EFF;
           }

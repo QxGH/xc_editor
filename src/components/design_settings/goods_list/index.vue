@@ -201,6 +201,7 @@ export default {
   },
   methods: {
     ...mapMutations(["CHANGE_DESIGN_TEMPLATE"]),
+    sortChange() {},
     changeHandle() {
       let templateNormal = this.design.template[this.designEditID];
       let templateData = templateNormal.data;

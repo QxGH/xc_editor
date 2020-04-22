@@ -85,7 +85,7 @@
             <div class="preview-wrap">
               <div
                 class="preview"
-                :style="{height: showNavbarDragBox && !designNavData.hide ? '667px' : '617px'}"
+                :style="{height: !designNavData.hide ? '667px' : '617px'}"
               >
                 <div
                   class="preview-header"
@@ -153,14 +153,13 @@
                             <div
                               class="preview-list-box"
                               :id="'previewListBox-'+index"
-                              :class="{'isSelect': index === designEditIndex}"
+                              :class="{'isSelect': index === designEditIndex && item.type != 'freeContainer', 'isSelectFree': item.type == 'freeContainer'}"
                               :style="{marginBottom: item.setting.marginBottom+'px'}"
                               :key="item.id"
                               @click="clickComponent(item, index, $event)"
                               @mouseover="mouseoverComponenter(item, index, $event)"
                               @mouseout="mouseoutComponenter(item, index, $event)"
                               v-if="item.type != 'free'"
-                              :data-com="item.previewComponent"
                             >
                               <component
                                 :is="item.previewComponent"
@@ -285,7 +284,7 @@ export default {
       selectNavbar: false, // 是否选中底部导航
       showPageSetting: false, // 是否显示页面设置
       settingComponent: "", // 当前应该显示的设置组件
-      settingFreeComponentIndex: "", // 当前应该显示的自由容器设置组件的下标
+      settingFreeComponentIndex: 0, // 当前应该显示的自由容器设置组件的下标
       listGroupOption: { name: "normal", pull: "clone", put: false },
       dragDisabled: false,
       componentsHandle: {
@@ -434,7 +433,7 @@ export default {
     },
     handleScroll(vertical, horizontal, nativeEvent) {
       // scroll 滚动事件
-      console.log(vertical, horizontal, nativeEvent);
+      // console.log(vertical, horizontal, nativeEvent);
       this.componentsHandle.show = false;
     },
     changePage(val) {
@@ -442,7 +441,7 @@ export default {
         this.showBlankTips = false; // 隐藏空白页面提示
       }
       this.settingComponent = "";
-      this.settingFreeComponentIndex = "";
+      this.settingFreeComponentIndex = 0;
       this.CHANGE_DESIGN_EDIT_INDEX("");
 
       this.pageSettingHandle();
@@ -499,6 +498,7 @@ export default {
             evt.target.classList.contains("free-container-title")
           ) {
             // 点击的是 自由容器
+            this.settingFreeComponentIndex = 0;
             console.log("点击的是 自由容器");
             this.settingComponent = item.settingComponent;
           } else {
@@ -533,7 +533,7 @@ export default {
       } else {
         console.log("当前点击的是不自由容器");
         this.settingComponent = item.settingComponent;
-        this.settingFreeComponentIndex = ""; // 自由组件 setting index
+        this.settingFreeComponentIndex = 0; // 自由组件 setting index
       }
     },
     freeDelComponents(val) {
@@ -652,6 +652,26 @@ export default {
             val.newIndex,
             ""
           );
+          let label = val.item.dataset.label;
+          for (let item of this.componentsList) {
+            if (label === item.label) {
+              let obj = {
+                ...item,
+                id: uuidV4()
+              };
+              templateData[val.newIndex] = obj
+              // templateData[endIndex].setting.children.push(obj);
+              break;
+            }
+          };
+          let templateDefault = {
+            key: this.designEditID,
+            data: {
+              ...templateNormal,
+              data: templateData
+            }
+          };
+          this.CHANGE_DESIGN_TEMPLATE(templateDefault);
         }
       } else if (val.to.dataset.name === "freePreviewDrag") {
         // 自由组件拖动到自由容器
@@ -710,7 +730,7 @@ export default {
           }
         };
         this.CHANGE_DESIGN_TEMPLATE(template_);
-      }
+      };
       this.freeGroup = "free";
       this.listGroupOption.name = "normal";
       if (this.navbarList.length <= 0) {

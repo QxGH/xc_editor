@@ -77,6 +77,7 @@
 .free-container-wrap {
   position: relative;
   padding-top: 40px;
+  background: #fff;
 }
 
 .free-container-wrap .free-container-title {

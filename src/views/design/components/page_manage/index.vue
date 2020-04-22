@@ -152,7 +152,6 @@ export default {
       let id = this.design.data.templateMaxID + 1;
       let template = {
         key: "template-" + id,
-        type: 'custom',
         data: {
           setting: {
             name: "新建页面",
@@ -162,7 +161,8 @@ export default {
             shareDescribe: "",
             shareImage: ""
           },
-          data: []
+          data: [],
+          type: 'custom'
         }
       };
       this.CHANGE_DESIGN_TEMPLATE(template);

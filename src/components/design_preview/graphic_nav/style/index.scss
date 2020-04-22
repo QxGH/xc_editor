@@ -3,9 +3,11 @@
   height: 80px;
   text-align: center;
   border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
   display:flex;
   cursor: pointer;
   font-size: 0;
+  background: #fff;
   .nav-item {
     flex:1;
     text-align: center;

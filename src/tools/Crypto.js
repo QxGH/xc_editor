@@ -1,7 +1,8 @@
 import CryptoJS from 'crypto-js';
+import { Base64 } from 'js-base64';
 
 const key = CryptoJS.enc.Utf8.parse("wTuQtvphrscRMoNY"); //十六位十六进制数作为秘钥
-const iv = CryptoJS.enc.Utf8.parse('yku3fNnI2HJQWKd3'); //十六位十六进制数作为秘钥偏移量
+const iv = CryptoJS.enc.Utf8.parse(Base64.decode('CsQV2yK1uAa35As08niKsQ==')); //十六位十六进制数作为秘钥偏移量
 
 //加密方法
 const AesEncrypt = (word) => {

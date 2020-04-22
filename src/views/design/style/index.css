@@ -260,7 +260,11 @@
   position: relative;
 }
 
-.design .preview .preview-list .preview-list-box.isSelect .free-preview-list {
+.design .preview .preview-list .preview-list-box.isSelect {
+  border: 1px solid #409EFF;
+}
+
+.design .preview .preview-list .preview-list-box.isSelectFree .free-preview-list {
   border: 1px solid #409EFF;
 }
 
