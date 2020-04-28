@@ -12,11 +12,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in linkList.page" :key="item.id">
+                <tr v-for="item in linkList.page" :key="item.source.alias">
                   <td>
                     <el-radio
                       v-model="currentLinkID"
-                      :label="item.id"
+                      :label="item.source.alias"
                       @change="changeHandle(item)"
                     >{{item.name}}</el-radio>
                   </td>
@@ -35,9 +35,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in linkList.goods" :key="item.id">
+                <tr v-for="item in linkList.goods" :key="item.source.alias">
                   <td>
-                    <el-radio v-model="currentLinkID" :label="item.id" @change="changeHandle(item)">
+                    <el-radio v-model="currentLinkID" :label="item.source.alias" @change="changeHandle(item)">
                       <el-image
                         class="v-mid"
                         style="width: 40px; height: 40px"
@@ -61,11 +61,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in linkList.system" :key="item.id">
+                <tr v-for="item in linkList.system" :key="item.source.alias">
                   <td>
                     <el-radio
                       v-model="currentLinkID"
-                      :label="item.id"
+                      :label="item.source.alias"
                       @change="changeHandle(item)"
                     >{{item.name}}</el-radio>
                   </td>
@@ -81,11 +81,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in linkList.other" :key="item.id">
+                <tr v-for="item in linkList.other" :key="item.source.alias">
                   <td>
                     <el-radio
                       v-model="currentLinkID"
-                      :label="item.id"
+                      :label="item.source.alias"
                       @change="changeHandle(item)"
                     >{{item.name}}</el-radio>
                   </td>
@@ -133,87 +133,26 @@ export default {
       linkList: {
         page: [
           {
-            id: "page-1",
-            type: "自定义页面",
-            name: "页面-1",
-            url: "pages/logs/index-1",
-            createdTime: "2020-12-29 23:23:23"
-          },
-          {
-            id: "page-2",
-            type: "自定义页面",
-            name: "页面-2",
-            url: "pages/logs/index-1",
-            createdTime: "2020-12-29 23:23:23"
-          },
-          {
-            id: "page-3",
-            type: "自定义页面",
-            name: "页面-3",
-            url: "pages/logs/index-1",
-            createdTime: "2020-12-29 23:23:23"
+            type: "custom",
+            name: "首页",
+            source: {
+              router: '/page/index/index',
+              alias: 'index'
+            }
           }
         ],
-        goods: [
-          {
-            id: "goods-1",
-            type: "商品",
-            name: "商品-1",
-            picture: "",
-            class: "商品分类",
-            url: "pages/logs/index-1",
-            createdTime: "2020-12-29 23:23:23"
-          },
-          {
-            id: "goods-2",
-            type: "商品",
-            name: "商品-2",
-            picture: "",
-            class: "商品分类",
-            url: "pages/logs/index-1",
-            createdTime: "2020-12-29 23:23:23"
-          }
-        ],
+        goods: [],
         system: [
           {
-            id: "system-1",
-            type: "系统页面",
-            name: "系统-1",
-            url: "pages/logs/index-1"
-          },
-          {
-            id: "system-2",
-            type: "系统页面",
-            name: "系统-2",
-            url: "pages/logs/index-1"
-          },
-          {
-            id: "system-3",
-            type: "系统页面",
-            name: "系统-3",
-            url: "pages/logs/index-1"
+            type: "system",
+            name: "个人中心",
+            source: {
+              router: '/page/user/index',
+              alias: 'userCenter'
+            }
           }
         ],
-        other: [
-          {
-            id: "other-1",
-            type: "其他",
-            name: "其他-1",
-            url: "pages/logs/index-1"
-          },
-          {
-            id: "other-2",
-            type: "其他",
-            name: "其他-2",
-            url: "pages/logs/index-1"
-          },
-          {
-            id: "other-3",
-            type: "其他",
-            name: "其他-3",
-            url: "pages/logs/index-1"
-          }
-        ]
+        other: []
       }
     };
   },

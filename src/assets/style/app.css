@@ -93,3 +93,9 @@ ul, li {
 .v-mid {
   vertical-align: middle;
 }
+
+.normal-btn {
+  padding: 0;
+  width: 120px;
+  height: 32px;
+}

@@ -1,5 +1,7 @@
 import Cookies from 'js-cookie'
 import { AesDecrypt } from './Crypto'
+import store from '@/store'
+
 
 // 获取 token
 const getUserToken = () => {
@@ -47,11 +49,11 @@ const getStoreToken = () => {
 
 // 清除cookie信息
 const clearCookie = () => {
-  Cookies.remove('userToken', { path: '/' });
-  Cookies.remove('userRoles', { path: '/' });
-  Cookies.remove('userInfo', { path: '/' });
-  Cookies.remove('storeInfo', { path: '/' });
-  Cookies.remove('storeToken', { path: '/' });
+  Cookies.remove('userToken', { path: '/', domain: store.state.domainURL });
+  Cookies.remove('userRoles', { path: '/', domain: store.state.domainURL });
+  Cookies.remove('userInfo', { path: '/', domain: store.state.domainURL });
+  Cookies.remove('storeInfo', { path: '/', domain: store.state.domainURL });
+  Cookies.remove('storeToken', { path: '/',domain: store.state.domainURL });
 }
 
 export {

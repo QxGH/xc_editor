@@ -98,7 +98,7 @@ export default {
       this.showLinkSelector = true;
     },
     submitLinkHandle(val) {
-      if (val.id) {
+      if (val) {
         let templateNormal = this.design.template[this.designEditID];
         let templateData = templateNormal.data;
         templateData[this.designEditIndex].setting.children[

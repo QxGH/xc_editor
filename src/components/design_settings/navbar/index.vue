@@ -18,12 +18,12 @@
             </el-radio-group>
           </div>
           <el-form-item label="导航文字颜色（未选中）：">
-            <el-color-picker v-model="setting.unCheckedTextColor" @change="changeHandle"></el-color-picker>
-            <span class="color-tips">{{setting.unCheckedTextColor}}</span>
+            <el-color-picker v-model="setting.color" @change="changeHandle"></el-color-picker>
+            <span class="color-tips">{{setting.color}}</span>
           </el-form-item>
           <el-form-item label="导航文字颜色（已选中）：">
-            <el-color-picker v-model="setting.checkedTextColor" @change="changeHandle"></el-color-picker>
-            <span class="color-tips">{{setting.checkedTextColor}}</span>
+            <el-color-picker v-model="setting.selectedColor" @change="changeHandle"></el-color-picker>
+            <span class="color-tips">{{setting.selectedColor}}</span>
           </el-form-item>
         </el-form>
       </el-collapse-item>
@@ -165,11 +165,11 @@ export default {
   },
   methods: {
     ...mapMutations([
-      "CHANGE_DESIGN_NAV",
-      "CHANGE_DESIGN_NAV_MAX"
+      "CHANGE_DESIGN_TABBAR",
+      "CHANGE_DESIGN_TABBAR_MAX"
     ]),
     changeHandle() {
-      this.CHANGE_DESIGN_NAV(this.setting);
+      this.CHANGE_DESIGN_TABBAR(this.setting);
     },
     dragStart(val) {
       this.dragging = true;
@@ -207,19 +207,18 @@ export default {
         this.$message.warning("最多可添加5个导航！");
         return;
       }
-      let max_id = this.design.data.nav.navMaxID + 1;
+      let max_id = this.design.data.tabbar.tabbarMaxID + 1;
       let newObj = {
-        id: "nav-" + max_id,
+        id: "tabbar-" + max_id,
         title: "首页",
         icon: {
           id: "home",
-          label: "首页",
           unChecked: "icon-home",
           checked: "icon-home-s"
         },
-        link: {}
+        link: null
       };
-      this.CHANGE_DESIGN_NAV_MAX(max_id);
+      this.CHANGE_DESIGN_TABBAR_MAX(max_id);
 
       settingList.push(newObj);
       this.setting.list = settingList;
@@ -240,7 +239,7 @@ export default {
       this.showLinkSelector = true;
     },
     submitLinkHandle(val) {
-      if (val.id) {
+      if (val) {
         this.setting.list[this.currentLinkIndex].link = val;
         this.changeHandle();
       };

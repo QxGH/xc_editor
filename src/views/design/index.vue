@@ -62,14 +62,7 @@
         <!-- 左侧 list end -->
         <!-- 中间 preview start -->
         <el-main>
-          <draggable
-            class="preview-wrap-list"
-            :list="previewWrapList"
-            group="normal"
-            element="div"
-            dragClass="draggable"
-            :disabled="dragDisabled"
-          >
+          <div class="main-box">
             <!-- 页面设置 & 底部菜单设置 start -->
             <div class="fixed-btn-box" v-show="designEditID">
               <button class="btn" @click="pageSettingHandle">
@@ -81,118 +74,132 @@
                 底部菜单
               </button>
             </div>
-            <!-- 页面设置 & 底部菜单设置 end -->
-            <div class="preview-wrap">
-              <div
-                class="preview"
-                :style="{height: !designNavData.hide ? '667px' : '617px'}"
+            <vuescroll ref="mainScroll">
+              <draggable
+                class="preview-wrap-list"
+                :list="previewWrapList"
+                group="normal"
+                element="div"
+                dragClass="draggable"
+                :disabled="dragDisabled"
               >
-                <div
-                  class="preview-header"
-                  @click="pageSettingHandle"
-                  :style="{backgroundColor: designEditData.setting.navBgColor, color: designEditData.setting.navTitColor}"
-                >{{designEditData.setting.name}}</div>
-                <div
-                  class="preview-main"
-                  ref="previewMain"
-                  :style="{background: designEditData.setting.pageBgColor}"
-                >
-                  <template v-if="designEditData.type === 'custom'">
-                    <!-- 自定义页面 显示 -->
-                    <transition name="el-fade-in">
-                      <div
-                        class="components-handle"
-                        v-show="componentsHandle.show"
-                        :style="{'top': componentsHandle.top+'px'}"
-                        @mouseover="mouseoverHandle"
-                        @mouseout="mouseoutHandle"
-                      >
-                        <span class="hendle-item" @click="componentsDel">
-                          <i class="el-icon-close"></i>
-                        </span>
-                        <span
-                          class="hendle-item"
-                          v-show="componentsHandle.upShow"
-                          @click="componentsToUp"
-                        >
-                          <i class="el-icon-upload2"></i>
-                        </span>
-                        <span
-                          class="hendle-item"
-                          v-show="componentsHandle.downShow"
-                          @click="componentsToDown"
-                        >
-                          <i class="el-icon-download"></i>
-                        </span>
-                      </div>
-                    </transition>
-                    <vuescroll ref="scroll" @handle-scroll="handleScroll">
-                      <template v-if="showBlankTips">
-                        <div class="blank-tips-box">
-                          <button class="add-btn" @click="changeTabsHandle('components')">
-                            <i class="el-icon-plus icon"></i>
-                            添加组件
-                          </button>
-                          <i class="tips-img"></i>
-                          <p class="tips-text">从左侧组件库中将组件拖入改页面</p>
-                        </div>
-                      </template>
-                      <template v-if="!showBlankTips">
-                        <draggable
-                          class="preview-list"
-                          :list="designEditData.data"
-                          data-name="previewList"
-                          group="normal"
-                          element="div"
-                          @change="previewLog"
-                          dragClass="draggable"
-                          :disabled="dragDisabled"
-                          :scroll="true"
-                        >
-                          <template v-for="(item, index) in designEditData.data">
-                            <div
-                              class="preview-list-box"
-                              :id="'previewListBox-'+index"
-                              :class="{'isSelect': index === designEditIndex && item.type != 'freeContainer', 'isSelectFree': item.type == 'freeContainer'}"
-                              :style="{marginBottom: item.setting.marginBottom+'px'}"
-                              :key="item.id"
-                              @click="clickComponent(item, index, $event)"
-                              @mouseover="mouseoverComponenter(item, index, $event)"
-                              @mouseout="mouseoutComponenter(item, index, $event)"
-                              v-if="item.type != 'free'"
+                <!-- 页面设置 & 底部菜单设置 end -->
+                <div class="preview-wrap">
+                  <div
+                    class="preview"
+                    :style="{height: !designTabbarData.hide ? '667px' : '617px'}"
+                  >
+                    <div
+                      class="preview-header"
+                      @click="pageSettingHandle"
+                      :style="{backgroundColor: designEditData.setting.navBgColor, color: designEditData.setting.navTitColor}"
+                    >{{designEditData.setting.name}}</div>
+                    <div
+                      class="preview-main"
+                      id="previewMain"
+                      ref="previewMain"
+                      :style="{background: designEditData.setting.pageBgColor}"
+                    >
+                      <template v-if="designEditData.type === 'custom'">
+                        <!-- 自定义页面 显示 -->
+                        <transition name="el-fade-in">
+                          <div
+                            class="components-handle"
+                            v-show="componentsHandle.show"
+                            :style="{'top': componentsHandle.top+'px'}"
+                            @mouseover="mouseoverHandle"
+                            @mouseout="mouseoutHandle"
+                          >
+                            <span class="hendle-item" @click="componentsDel">
+                              <i class="el-icon-close"></i>
+                            </span>
+                            <span
+                              class="hendle-item"
+                              v-show="componentsHandle.upShow"
+                              @click="componentsToUp"
                             >
-                              <component
-                                :is="item.previewComponent"
-                                :setting="item.setting"
-                                :freeGroup="freeGroup"
-                                :itemIndex="index"
-                                @freeComponentClick="freeComponentClick"
-                                @dragDisabledHandle="dragDisabledHandle"
-                                @freeDelComponents="freeDelComponents"
-                              ></component>
+                              <i class="el-icon-upload2"></i>
+                            </span>
+                            <span
+                              class="hendle-item"
+                              v-show="componentsHandle.downShow"
+                              @click="componentsToDown"
+                            >
+                              <i class="el-icon-download"></i>
+                            </span>
+                          </div>
+                        </transition>
+                        <vuescroll ref="scroll" @handle-scroll="handleScroll">
+                          <template v-if="showBlankTips">
+                            <div class="blank-tips-box">
+                              <button class="add-btn" @click="changeTabsHandle('components')">
+                                <i class="el-icon-plus icon"></i>
+                                添加组件
+                              </button>
+                              <i class="tips-img"></i>
+                              <p class="tips-text">从左侧组件库中将组件拖入改页面</p>
                             </div>
                           </template>
-                        </draggable>
+                          <template v-if="!showBlankTips">
+                            <draggable
+                              class="preview-list"
+                              id="previewList"
+                              :list="designEditData.data"
+                              data-name="previewList"
+                              group="normal"
+                              element="div"
+                              @change="previewLog"
+                              dragClass="draggable"
+                              :disabled="dragDisabled"
+                              :scroll="true"
+                            >
+                              <template v-for="(item, index) in designEditData.data">
+                                <div
+                                  class="preview-list-box"
+                                  :id="'previewListBox-'+index"
+                                  :class="{'isSelect': index === designEditIndex && item.type != 'freeContainer', 'isSelectFree': item.type == 'freeContainer'}"
+                                  :style="{marginBottom: item.setting.style.marginBottom+'px'}"
+                                  :key="item.id"
+                                  @click="clickComponent(item, index, $event)"
+                                  @mouseover="mouseoverComponenter(item, index, $event)"
+                                  @mouseout="mouseoutComponenter(item, index, $event)"
+                                  v-if="item.type != 'free'"
+                                >
+                                  <component
+                                    :is="item.previewComponent"
+                                    :setting="item.setting"
+                                    :freeGroup="freeGroup"
+                                    :itemIndex="index"
+                                    @freeComponentClick="freeComponentClick"
+                                    @dragDisabledHandle="dragDisabledHandle"
+                                    @freeDelComponents="freeDelComponents"
+                                  ></component>
+                                </div>
+                              </template>
+                            </draggable>
+                          </template>
+                        </vuescroll>
                       </template>
-                    </vuescroll>
-                  </template>
-                  <template v-else>
-                    <!-- 系统页面 显示 -->
-                    <template v-for="item in designEditData.data">
-                      <component
-                        :is="item.previewComponent"
-                        :key="item.id"
-                      ></component>
-                    </template>
-                  </template>
+                      <template v-else>
+                        <!-- 系统页面 显示 -->
+                        <template v-for="item in designEditData.data">
+                          <component :is="item.previewComponent" :key="item.id"></component>
+                        </template>
+                      </template>
+                    </div>
+                    <!-- <div class="preview-navbar" v-if="showNavbarDragBox && !designTabbarData.hide"> -->
+                    <div
+                      class="preview-navbar"
+                      v-if="!designTabbarData.hide"
+                      @click="bottomMenuHandle"
+                    >
+                      <Navbar :setting="designTabbarData"></Navbar>
+                    </div>
+                  </div>
                 </div>
-                <!-- <div class="preview-navbar" v-if="showNavbarDragBox && !designNavData.hide"> -->
-                <div class="preview-navbar" v-if="!designNavData.hide" @click="bottomMenuHandle">
-                  <Navbar :setting="designNavData"></Navbar>
-                </div>
-              </div>
-            </div>
-          </draggable>
+              </draggable>
+            </vuescroll>
+          </div>
         </el-main>
         <!-- 中间 preview end -->
         <!-- 右侧 setting start -->
@@ -210,26 +217,18 @@
               </template>
               <!-- 底部导航组件 设置 -->
               <template v-if="settingComponent && selectNavbar && !showPageSetting">
-                <component
-                  :is="settingComponent"
-                  :setting="designNavData"
-                ></component>
+                <component :is="settingComponent" :setting="designTabbarData"></component>
               </template>
               <!-- 头部 页面设置 -->
               <template v-if="settingComponent && showPageSetting">
-                <component
-                  :is="settingComponent"
-                  :setting="designEditData.setting"
-                ></component>
+                <component :is="settingComponent" :setting="designEditData.setting"></component>
               </template>
             </vuescroll>
           </template>
           <template v-else>
             <!-- 系统页面设置 -->
             <div class="setting-title">我的</div>
-            <div class="stytem-setting-tips">
-              系统页面，暂不支持编辑
-            </div>
+            <div class="stytem-setting-tips">系统页面，暂不支持编辑</div>
           </template>
         </el-aside>
         <!-- 右侧 setting end -->
@@ -263,7 +262,7 @@ import FreeImageSetting from "@/components/design_settings/free_image";
 import Navbar from "@/components/design_preview/navbar";
 import NavbarSetting from "@/components/design_settings/navbar";
 import PageSetting from "@/components/design_settings/page_setting";
-import UserCenter from '@/components/design_preview/user_center';
+import UserCenter from "@/components/design_preview/user_center";
 
 import componentsListConfig from "./componentsList";
 import designConfig from "./designConfig";
@@ -304,12 +303,8 @@ export default {
     };
   },
   computed: {
-    ...mapState([
-      "design",
-      "designEditID",
-      "designEditIndex"
-    ]),
-    ...mapGetters(["designEditData", "designNavData"])
+    ...mapState(["design", "designEditID", "designEditIndex"]),
+    ...mapGetters(["designEditData", "designTabbarData"])
   },
   created() {
     this.componentsList = this.deepClone(componentsListConfig);
@@ -342,7 +337,8 @@ export default {
       "CHANGE_DESIGN",
       "CHANGE_DESIGN_TEMPLATE",
       "CHANGE_DESIGN_EDIT_ID",
-      "CHANGE_DESIGN_EDIT_INDEX"
+      "CHANGE_DESIGN_EDIT_INDEX",
+      "CHANGE_DESIGN_COMPONENTS_MAX"
     ]),
     init() {
       if (this.purpose === "add") {
@@ -367,7 +363,7 @@ export default {
       // 组件删除
       let handleIndex = this.handleIndex;
 
-      let templateNormal = this.design.template[this.designEditID]
+      let templateNormal = this.design.template[this.designEditID];
       let templateData = templateNormal.data;
       templateData.splice(handleIndex, 1);
 
@@ -392,7 +388,7 @@ export default {
       // 组件排序向上
       let handleIndex = this.handleIndex;
 
-      let templateNormal = this.design.template[this.designEditID]
+      let templateNormal = this.design.template[this.designEditID];
       let templateData = templateNormal.data;
       // templateData.splice(handleIndex, 1);
 
@@ -414,7 +410,7 @@ export default {
       // 组件排序向下
       let handleIndex = this.handleIndex;
 
-      let templateNormal = this.design.template[this.designEditID]
+      let templateNormal = this.design.template[this.designEditID];
       let templateData = templateNormal.data;
 
       const temp = this.deepClone(templateData[handleIndex]);
@@ -468,10 +464,10 @@ export default {
       this.componentsHandle.downShow = true;
       if (index == 0) {
         this.componentsHandle.upShow = false;
-      };
+      }
       if (index == this.designEditData.data.length - 1) {
         this.componentsHandle.downShow = false;
-      };
+      }
     },
     mouseoutComponenter(item, index, evt) {
       // 鼠标移出组件事件
@@ -598,35 +594,39 @@ export default {
           if (item.label == "freeContainer") {
             item.setting.children.splice(0, 1);
           }
-        };
-      };
+        }
+      }
       // 放置容器
+      let componentsMaxID = this.design.data.componentsMaxID;
       if (val.to.dataset.name === "previewList") {
         // 组件拖动到普通容器
         if (val.item.dataset.type === "free") {
           // 自由组件拖动到普通容器
           // newIndex
           let componentsList = this.deepClone(componentsListConfig);
-          let obj = {};
-          for (let item of componentsList) {
-            if (item.label == "freeContainer") {
-              obj = item;
-              obj.id = uuidV4();
+          let FPobj = {};
+          componentsMaxID++;
+          for (let FPitem of componentsList) {
+            if (FPitem.label == "freeContainer") {
+              FPobj = FPitem;
+              FPobj.id = componentsMaxID;
+              delete FPobj.explain;
               break;
             }
-          };
-          for (let item of componentsList) {
-            if (item.label == val.item.dataset.label) {
-              obj.setting.children = [
-                {
-                  ...item,
-                  id: uuidV4()
-                }
-              ];
+          }
+          componentsMaxID++;
+          for (let FCitem of componentsList) {
+            if (FCitem.label == val.item.dataset.label) {
+              let childrenObj = {
+                ...FCitem,
+                id: componentsMaxID
+              };
+              delete childrenObj.explain;
+              FPobj.setting.children = [childrenObj];
               break;
             }
-          };
-          templateData.splice(val.newIndex, 1, obj);
+          }
+          templateData.splice(val.newIndex, 1, FPobj);
           let template = {
             key: this.designEditID,
             data: {
@@ -635,6 +635,7 @@ export default {
             }
           };
           this.CHANGE_DESIGN_TEMPLATE(template);
+          this.CHANGE_DESIGN_COMPONENTS_MAX(componentsMaxID);
 
           this.settingFreeComponentIndex = 0; // 默认选中第一个自由组件
           this.$nextTick(() => {
@@ -653,17 +654,18 @@ export default {
             ""
           );
           let label = val.item.dataset.label;
-          for (let item of this.componentsList) {
-            if (label === item.label) {
-              let obj = {
-                ...item,
-                id: uuidV4()
+          componentsMaxID++;
+          for (let Ditem of this.componentsList) {
+            if (label === Ditem.label) {
+              let default_obj = {
+                ...Ditem,
+                id: componentsMaxID
               };
-              templateData[val.newIndex] = obj
-              // templateData[endIndex].setting.children.push(obj);
+              delete default_obj.explain;
+              templateData.splice([val.newIndex], 0, default_obj);
               break;
             }
-          };
+          }
           let templateDefault = {
             key: this.designEditID,
             data: {
@@ -672,12 +674,17 @@ export default {
             }
           };
           this.CHANGE_DESIGN_TEMPLATE(templateDefault);
+          this.CHANGE_DESIGN_COMPONENTS_MAX(componentsMaxID);
         }
       } else if (val.to.dataset.name === "freePreviewDrag") {
         // 自由组件拖动到自由容器
         let scrollTop = this.$refs["scroll"].scrollPanelElm
           ? this.$refs["scroll"].scrollPanelElm.scrollTop
           : 0;
+        // let mainScrollTop = this.$refs["mainScroll"].scrollPanelElm
+        //   ? this.$refs["mainScroll"].scrollPanelElm.scrollTop
+        //   : 0;
+        //   console.log('mainScrollTop', mainScrollTop)
         let offsetX = 0,
           offsetY = 0;
 
@@ -685,14 +692,18 @@ export default {
         let dropBoxTop = dropBox.getBoundingClientRect().top;
         let dropBoxLeft = dropBox.getBoundingClientRect().left;
 
+        let previewListTop = document.getElementById('previewList').getBoundingClientRect().top
+        let previewMainTop = document.getElementById('previewMain').getBoundingClientRect().top
+        
         offsetX = val.originalEvent.x - dropBoxLeft + 1 - this.dragOffsetData.x;
 
-        offsetY =
-          val.originalEvent.y -
-          dropBoxTop +
-          scrollTop -
-          this.dragOffsetData.y +
-          1;
+        // offsetY =
+        //   val.originalEvent.y -
+        //   dropBoxTop +
+        //   scrollTop -
+        //   this.dragOffsetData.y +
+        //   1;
+        offsetY = val.originalEvent.y - (dropBoxTop - previewListTop - scrollTop + previewMainTop) - this.dragOffsetData.y;
 
         // 组件拖入超出区域 显示到区域内
         if (offsetX < 0) {
@@ -704,23 +715,24 @@ export default {
           offsetY = 0;
         } else if (offsetY > val.to.offsetHeight - 100) {
           offsetY = val.to.offsetHeight - 100;
-        };
+        }
 
         let label = val.item.dataset.label;
+        componentsMaxID++;
         for (let item of this.componentsList) {
           if (label === item.label) {
             let obj = {
               ...item,
-              id: uuidV4()
+              id: componentsMaxID
             };
+            delete obj.explain;
             obj.setting.x = offsetX;
             obj.setting.y = offsetY;
-            obj.setting.z =
-              templateData[endIndex].setting.children.length + 1;
+            obj.setting.z = templateData[endIndex].setting.children.length + 1;
             templateData[endIndex].setting.children.push(obj);
             break;
           }
-        };
+        }
 
         let template_ = {
           key: this.designEditID,
@@ -730,12 +742,13 @@ export default {
           }
         };
         this.CHANGE_DESIGN_TEMPLATE(template_);
-      };
+        this.CHANGE_DESIGN_COMPONENTS_MAX(componentsMaxID);
+      }
       this.freeGroup = "free";
       this.listGroupOption.name = "normal";
       if (this.navbarList.length <= 0) {
         this.showNavbarDragBox = false;
-      };
+      }
       if (this.designEditData.data.length === 0) {
         this.showBlankTips = true; // 显示空白页面提示
       } else {
@@ -749,7 +762,7 @@ export default {
       // 如果已经有了 navbar 则return
       if (obj.type == "navbar" && this.navbarList.length > 0) {
         return;
-      };
+      }
 
       let setting = {};
       for (let item of this.componentsList) {
@@ -803,9 +816,11 @@ export default {
         }
       };
 
-      let templateNormal = this.deepClone(this.design.template[this.designEditID]);
+      let templateNormal = this.deepClone(
+        this.design.template[this.designEditID]
+      );
       let templateData = templateNormal.data;
-      if(templateData.length > 0) {
+      if (templateData.length > 0) {
         templateData.map((item, index) => {
           if (item.type == "freeContainer") {
             freeFill.setting.height = Number(item.setting.height);
@@ -820,7 +835,7 @@ export default {
           }
         };
         this.CHANGE_DESIGN_TEMPLATE(template);
-      };
+      }
     },
     deepClone(target) {
       // 定义一个变量

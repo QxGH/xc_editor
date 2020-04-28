@@ -26,7 +26,7 @@
           </el-form-item>
           <el-form-item label="下方间隔：">
             <el-input-number
-              v-model="containerData.marginBottom"
+              v-model="containerData.style.marginBottom"
               @change="containerChange"
               controls-position="right"
               :min="0"
@@ -275,7 +275,7 @@ export default {
       this.showLinkSelector = true;
     },
     submitLinkHandle(val) {
-      if (val.id) {
+      if (val) {
         let templateNormal = this.design.template[this.designEditID];
         let templateData = templateNormal.data;
         templateData[this.designEditIndex].setting.children[

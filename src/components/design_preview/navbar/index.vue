@@ -1,7 +1,7 @@
 <template>
   <div class="navbar">
     <template v-for="item of setting.list">
-      <div class="nav-item" :key="item.id" :style="{color: setting.unCheckedTextColor}">
+      <div class="nav-item" :key="item.id" :style="{color: setting.color}">
         <span class="icon-box">
           <i class="font_family" :class="item.icon.unChecked"></i>
         </span>

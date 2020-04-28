@@ -3,7 +3,7 @@
     <template v-for="item of setting.list">
       <div class="nav-item" :key="item.id">
         <span class="icon-box">
-          <el-image style="width: 45px; height: 45px" :src="item.imageUrl" fit="contain"></el-image>
+          <el-image style="width: 48px; height: 48px" :src="item.imageUrl" fit="contain"></el-image>
         </span>
         <div class="title">{{item.title}}</div>
       </div>

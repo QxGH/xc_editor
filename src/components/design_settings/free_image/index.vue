@@ -26,7 +26,7 @@
           </el-form-item>
           <el-form-item label="下方间隔：">
             <el-input-number
-              v-model="containerData.marginBottom"
+              v-model="containerData.style.marginBottom"
               @change="containerChange"
               controls-position="right"
               :min="0"
@@ -37,10 +37,10 @@
       <el-collapse-item title="图片设置" name="2">
         <el-form ref="imageSettingForm" :model="setting" label-width="100px">
           <el-form-item label="图片设置：">
-            <div class="upload-selecctor">
-              <img v-show="setting.shareImage" :src="setting.shareImage" alt class="img" />
+            <div class="upload-selecctor" @click="checkImageHandle">
+              <img v-show="setting.imageUrl" :src="setting.imageUrl" alt class="img" />
               <span class="tips">更换图片</span>
-              <input type="file" class="file-input" title />
+              <!-- <input type="file" class="file-input" title /> -->
             </div>
             <span class="upload-tips">建议尺寸：400*300px</span>
           </el-form-item>
@@ -80,17 +80,13 @@
       </el-collapse-item>
     </el-collapse>
     <LinkSelector v-if="showLinkSelector" :link="setting.link" @submitLink="submitLinkHandle"></LinkSelector>
-    <!-- <el-divider>图片</el-divider>
-    <div class="image-selector" @click="selectorImageHandle">
-      <el-image style="width: 100px; height: 100px" :src="setting.imageUrl" fit="contain"></el-image>
-    </div>
-    <ImageSelector v-if="showImageSelector" :imageID="currentImageID" @submitImage="submitImageHandle"></ImageSelector>-->
+    <ImageManage :limit="1" @checkedImage="checkedImageHandle" v-if="showImageManage"></ImageManage>
   </div>
 </template>
 
 <script>
 import { mapState, mapGetters, mapMutations } from "vuex";
-import ImageSelector from "../../common/image_selector";
+import ImageManage from "@/components/common/image_manage";
 import LinkSelector from "../../common/link_selector";
 
 export default {
@@ -100,8 +96,7 @@ export default {
       activeNames: ["1", "2"],
       containerData: {},  // 父级模块数据
       showLinkSelector: false,
-      showImageSelector: false, // 是否显示图片选择器
-      currentImageID: "default" //当前选中图片id
+      showImageManage: false, // 显示图片库
     };
   },
   computed: {
@@ -118,7 +113,7 @@ export default {
     }
   },
   components: {
-    ImageSelector,
+    ImageManage,
     LinkSelector
   },
   props: {
@@ -171,7 +166,7 @@ export default {
       this.showLinkSelector = true;
     },
     submitLinkHandle(val) {
-      if (val.id) {
+      if (val) {
         let templateNormal = this.design.template[this.designEditID];
         let templateData = templateNormal.data;
         templateData[this.designEditIndex].setting.children[
@@ -189,14 +184,16 @@ export default {
       }
       this.showLinkSelector = false; // 显示图片选择器
     },
-    selectorImageHandle() {
-      this.currentImageID = this.setting.imageID;
-      this.showImageSelector = true; // 显示图片选择器
+    checkImageHandle() {
+      this.showImageManage = true;
     },
-    submitImageHandle(val) {
-      this.showImageSelector = false; // 显示图片选择器
-      
-    },
+    checkedImageHandle(val) {
+      this.showImageManage = false;
+      if(val.length > 0) {
+        this.setting.imageUrl = val[0].src;
+        this.changeHandle();
+      };
+    }
   }
 };
 </script>

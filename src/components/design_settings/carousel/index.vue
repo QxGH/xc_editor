@@ -27,7 +27,7 @@
           </el-form-item>
           <el-form-item label="下方间隔：">
             <el-input-number
-              v-model="setting.marginBottom"
+              v-model="setting.style.marginBottom"
               @change="changeHandle"
               controls-position="right"
               :min="0"
@@ -69,10 +69,10 @@
                     <div class="custom-form-group clearfix">
                       <label class="custom-form-label">图片设置：</label>
                       <div class="custom-form-ctrl">
-                        <div class="upload-selecctor" style="width: 96px; height: 64px;">
+                        <div class="upload-selecctor" @click="checkImageHandle(index)" style="width: 96px; height: 64px;">
                           <img v-show="item.imageUrl" :src="item.imageUrl" alt class="img" />
                           <span class="tips">更换图片</span>
-                          <input type="file" class="file-input" title />
+                          <!-- <input type="file" class="file-input" title /> -->
                         </div>
                         <span class="upload-tips">建议尺寸：750*400px</span>
                       </div>
@@ -107,23 +107,7 @@
     </el-collapse>
 
     <LinkSelector v-if="showLinkSelector" :link="currentLink" @submitLink="submitLinkHandle"></LinkSelector>
-    <!-- <el-collapse v-model="activeName" accordion>
-      <template v-for="(item, index) in setting.list">
-        <el-collapse-item :title="'carousel-'+(index+1)" :name="index+1" :key="index">
-          <div class="image-selector" @click="selectorImageHandle(item.imageID)">
-            <el-image style="width: 100px; height: 100px" :src="item.imageUrl" fit="contain"></el-image>
-          </div>
-        </el-collapse-item>
-      </template>
-    </el-collapse>
-    <div class="btn-box">
-      <el-button class="add-btn" type="primary" @click="addHandle">新增</el-button>
-    </div>
-    <ImageSelector
-      v-if="showImageSelector"
-      :imageID="currentImageID"
-      @submitImage="submitImageHandle"
-    ></ImageSelector>-->
+    <ImageManage :limit="1" @checkedImage="checkedImageHandle" v-if="showImageManage"></ImageManage>
   </div>
 </template>
 
@@ -131,7 +115,7 @@
 import uuidV4 from "uuid/v4";
 import draggable from "vuedraggable";
 import { mapState, mapMutations } from "vuex";
-import ImageSelector from "../../common/image_selector";
+import ImageManage from "@/components/common/image_manage";
 import LinkSelector from "../../common/link_selector";
 
 export default {
@@ -142,16 +126,15 @@ export default {
       dragging: false, // 正在拖动
       carouselItemActive: [],
       showLinkSelector: false,
-      showImageSelector: false, // 是否显示图片选择器
-      currentImageID: "default", //当前选中图片id
-      currentImageIndex: "",
       currentLink: {}, // 当前要设置点击事件 的 数据
-      currentLinkIndex: "" // 当前要设置点击事件 的 索引
+      currentLinkIndex: "", // 当前要设置点击事件 的 索引
+      showImageManage: false, // 显示图片库
+      editCarouselIndex: '',  //当前编辑得轮播图 index
     };
   },
   props: ["setting"],
   components: {
-    ImageSelector,
+    ImageManage,
     LinkSelector,
     draggable
   },
@@ -179,9 +162,8 @@ export default {
       };
       let newObj = {
         id: uuidV4(),
-        imageID: "default" + new Date().getTime(),
         imageUrl: "https://qxtodo.com/editor/animation_wallpaper.jpg",
-        link: {}
+        link: null
       };
       settingList.push(newObj);
       this.setting.list = settingList;
@@ -225,7 +207,7 @@ export default {
       this.showLinkSelector = true;
     },
     submitLinkHandle(val) {
-      if (val.id) {
+      if (val) {
         let templateNormal = this.design.template[this.designEditID];
         let templateData = templateNormal.data;
 
@@ -265,13 +247,19 @@ export default {
       let falg = this.carouselItemActive.includes(row.id);
       return falg;
     },
-    selectorImageHandle(imageID) {
-      this.currentImageID = imageID;
-      this.showImageSelector = true; // 显示图片选择器
+    checkImageHandle(index) {
+      this.editCarouselIndex = index;
+      this.showImageManage = true;
     },
-    submitImageHandle(val) {
-      this.showImageSelector = false; // 显示图片选择器
-      
+    checkedImageHandle(val) {
+      this.showImageManage = false;
+      if(val.length > 0) {
+        let list = this.setting.list;
+        let index = this.editCarouselIndex;
+        list[index].imageUrl = val[0].src;
+        this.setting.list = list;
+        this.changeHandle();
+      };
     }
   }
 };

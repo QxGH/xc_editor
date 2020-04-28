@@ -48,7 +48,7 @@
                     <div class="handle-opt" @click.stop>
                       <i
                         class="el-icon-document-copy icon"
-                        @click.stop="copyChildren(item, childrenItem, index)"
+                        @click.stop="copyChildren(item, childrenItem, index, childrenIndex)"
                       ></i>
                       <el-dropdown
                         @click.stop
@@ -131,7 +131,7 @@ export default {
     ...mapMutations([
       "CHANGE_DESIGN_EDIT_ID",
       "CHANGE_DESIGN_TEMPLATE",
-      "CHANGE_DESIGN_TEMPLATE_MAX",
+      "CHANGE_DESIGN_PAGE_MAX",
       "CHANGE_DESIGN_GROUP",
       "DELETE_DESIGN_TEMPLATE",
     ]),
@@ -149,15 +149,15 @@ export default {
     },
     addPage(index) {
       // 新建页面
-      let id = this.design.data.templateMaxID + 1;
-      let template = {
-        key: "template-" + id,
+      let id = this.design.data.pageMaxID + 1;
+      let page = {
+        key: "page-" + id,
         data: {
           setting: {
-            name: "新建页面",
+            name: "新建页面"+id,
             pageBgColor: "#FFFFFF",
             navBgColor: "#FFFFFF",
-            navTitColor: "black",
+            navTitColor: "#000000",
             shareDescribe: "",
             shareImage: ""
           },
@@ -165,13 +165,13 @@ export default {
           type: 'custom'
         }
       };
-      this.CHANGE_DESIGN_TEMPLATE(template);
-      this.CHANGE_DESIGN_TEMPLATE_MAX(id);
+      this.CHANGE_DESIGN_TEMPLATE(page);
+      this.CHANGE_DESIGN_PAGE_MAX(id);
 
       let group = this.design.group;
       let groupObj = {
-        id: "template-" + id,
-        name: template.data.setting.name
+        id: "page-" + id,
+        name: page.data.setting.name
       };
       if (index !== "") {
         group.custom[index].children.push(groupObj);
@@ -183,68 +183,70 @@ export default {
     },
     copyParent(item, index) {
       // 复制父级页面
-      let templateMaxID = this.design.data.templateMaxID;
+      let pageMaxID = this.design.data.pageMaxID;
       let design = this.design;
       let item_ = deepClone(item);
       let group = this.design.group;
       let groupObj = {}; // 分组
 
       // 先复制父级
-      templateMaxID++;
+      pageMaxID++;
       let newParentTemplate = deepClone(design.template[item_.id]);
       let template = {
-        key: "template-" + templateMaxID,
+        key: "page-" + pageMaxID,
         data: newParentTemplate
       };
+      template.data.setting.name = item_.name + "-副本"
       this.CHANGE_DESIGN_TEMPLATE(template);
 
       groupObj = {
-        id: "template-" + templateMaxID,
+        id: "page-" + pageMaxID,
         name: item_.name + "-副本",
         children: []
       };
 
       if (item_.children.length > 0) {
         for (let i of item_.children) {
-          templateMaxID++;
+          pageMaxID++;
           let newChildrenTemplate = deepClone(design.template[i.id]);
           let template_ = {
-            key: "template-" + templateMaxID,
+            key: "page-" + pageMaxID,
             data: newChildrenTemplate
           };
           this.CHANGE_DESIGN_TEMPLATE(template_);
           groupObj.children.push({
-            id: "template-" + templateMaxID,
+            id: "page-" + pageMaxID,
             name: i.name + "-副本"
           });
         }
       }
-      group.custom.push(groupObj);
-      this.CHANGE_DESIGN_TEMPLATE_MAX(templateMaxID);
+      group.custom.splice(index+1, 0, groupObj);
+      this.CHANGE_DESIGN_PAGE_MAX(pageMaxID);
       this.CHANGE_DESIGN_GROUP(group);
     },
-    copyChildren(item, childrenItem, index) {
+    copyChildren(item, childrenItem, index, childrenIndex) {
       // 复制子级页面
-      let templateMaxID = this.design.data.templateMaxID;
+      let pageMaxID = this.design.data.pageMaxID;
       let design = this.design;
       let childrenItem_ = deepClone(childrenItem);
       let group = this.design.group;
       let groupObj = {}; // 分组
 
-      templateMaxID++;
+      pageMaxID++;
       let newTemplate = deepClone(design.template[childrenItem_.id]);
       let template = {
-        key: "template-" + templateMaxID,
+        key: "page-" + pageMaxID,
         data: newTemplate
       };
+      template.data.setting.name = childrenItem_.name + "-副本"
       this.CHANGE_DESIGN_TEMPLATE(template);
 
       groupObj = {
-        id: "template-" + templateMaxID,
+        id: "page-" + pageMaxID,
         name: childrenItem_.name + "-副本"
       };
-      group.custom[index].children.push(groupObj);
-      this.CHANGE_DESIGN_TEMPLATE_MAX(templateMaxID);
+      group.custom[index].children.splice(childrenIndex+1, 0, groupObj)
+      this.CHANGE_DESIGN_PAGE_MAX(pageMaxID);
       this.CHANGE_DESIGN_GROUP(group);
     },
     parentOptCommand(command, index, item) {

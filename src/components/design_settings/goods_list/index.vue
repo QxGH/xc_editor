@@ -18,7 +18,7 @@
           </el-form-item>
           <el-form-item label="下方间隔：">
             <el-input-number
-              v-model="setting.marginBottom"
+              v-model="setting.style.marginBottom"
               @change="changeHandle"
               controls-position="right"
               :min="0"
@@ -26,7 +26,7 @@
           </el-form-item>
           <el-form-item label="商品列表样式：">
             <div class="goods-list-style">
-              <div class="style-item default-style clearfix" :class="{'active': setting.style == 'default'}">
+              <div class="style-item default-style clearfix" :class="{'active': setting.styleType == 'default'}">
                 <i class="pull-left ele"></i>
                 <i class="pull-right ele"></i>
               </div>
@@ -159,38 +159,7 @@ export default {
   },
   props: {
     setting: {
-      type: Object,
-      default() {
-        return {
-          name: "商品列表",
-          hideName: false,
-          marginBottom: 16,
-          style: "default", // 样式
-          chooseMode: "auto", // 选择方式 hand / auto
-          group: [], // 分组
-          sort: "createTime", // 排序 createTime - 按上架时间排序；  priceDescending - 按价格降序； priceAscending - 按价格升序
-          numberType: "all", // 数量类型 all- 全部； custom - 自定义
-          number: 1,
-          autoList: [
-            {
-              id: "default-" + uuidV4(),
-              picture: "https://qxtodo.com/editor/animation_wallpaper.jpg",
-              name: "商品名称",
-              price: 8.88,
-              type: "商品类型"
-            }
-          ],
-          handList: [
-            {
-              id: "default-" + uuidV4(),
-              picture: "https://qxtodo.com/editor/animation_wallpaper.jpg",
-              name: "商品名称",
-              price: 8.88,
-              type: "商品类型"
-            }
-          ]
-        };
-      }
+      type: Object
     }
   },
   computed: {

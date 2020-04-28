@@ -41,11 +41,11 @@ const list = [
     version: 1,
     explain: '点击组件，将想展示在自由容器内的图片在右侧编辑框上传，该图片可自由拉伸至需要的大小,可附带链接。',
     setting: {
-      imageID: 'default',
       imageUrl: 'https://qxtodo.com/editor/animation_wallpaper.jpg',
       link: null,
       width: 100,
       height: 100,
+      style: {},
       x: 0,
       y: 0,
       z: 1
@@ -65,7 +65,8 @@ const list = [
       color: '#ffffff',
       bg: '#409eff',
       size: '14',
-      style: 'primary', // primary plain primaryRound plainRound
+      styleType: 'primary', // primary plain primaryRound plainRound
+      style: {},
       link: null,
       width: 100,
       height: 40,
@@ -85,6 +86,7 @@ const list = [
     explain: '万能热区是可覆盖在自由容器内的图片、文本组件之上透明区域，可对一张固定的图设置不同区域的跳转。',
     setting: {
       link: null,
+      style: {},
       width: 100,
       height: 40,
       x: 0,
@@ -105,7 +107,9 @@ const list = [
       height: '300',
       name: '自由容器',
       hideName: false,
-      marginBottom: 16,
+      style: {
+        marginBottom: 16
+      },
       children: []
     }
   }, {
@@ -121,11 +125,12 @@ const list = [
     setting: {
       height: '200',
       interval: 3,
-      marginBottom: 16,
+      style: {
+        marginBottom: 16
+      },
       list: [
         {
           id: uuidV4(),
-          imageID: "default",
           imageUrl: 'https://qxtodo.com/editor/animation_wallpaper.jpg',
           link: null
         }
@@ -144,9 +149,11 @@ const list = [
     setting: {
       name: '商品列表',
       hideName: false,
-      marginBottom: 16,
-      style: 'default', // 样式
+      styleType: 'default',
       chooseMode: 'auto', // 选择方式 hand / auto
+      style: {
+        marginBottom: 16
+      },
       group: [],  // 分组
       sort: 'createTime', // 排序 createTime - 按上架时间排序；  priceDescending - 按价格降序； priceAscending - 按价格升序
       numberType: 'all',  // 数量类型 all- 全部； custom - 自定义
@@ -181,12 +188,13 @@ const list = [
     version: 1,
     explain: '多个菜单导航，可跳转到不同的页面；',
     setting: {
-      marginBottom: 16,
-      style: 'default',
+      styleType: 'default',
+      style: {
+        marginBottom: 16
+      },
       list: [
         {
           id: uuidV4(),
-          imageID: "default",
           imageUrl: 'https://cdn.qinxus.com/animation_gril_banner_2.jpg',
           title: '标题',
           link: null

@@ -20,7 +20,7 @@
           </el-form-item>
           <el-form-item label="下方间隔：">
             <el-input-number
-              v-model="setting.marginBottom"
+              v-model="setting.style.marginBottom"
               @change="changeHandle"
               controls-position="right"
               :min="0"

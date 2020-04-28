@@ -26,7 +26,7 @@
           </el-form-item>
           <el-form-item label="下方间隔：">
             <el-input-number
-              v-model="containerData.marginBottom"
+              v-model="containerData.style.marginBottom"
               @change="containerChange"
               controls-position="right"
               :min="0"
@@ -41,28 +41,28 @@
             <ul class="btn-style-list clearfix">
               <li
                 class="item"
-                :class="{'active': setting.style == 'primary'}"
+                :class="{'active': setting.styleType == 'primary'}"
                 @click="changeBtnStyle('primary')"
               >
                 <el-button type="primary">按钮</el-button>
               </li>
               <li
                 class="item"
-                :class="{'active': setting.style == 'plain'}"
+                :class="{'active': setting.styleType == 'plain'}"
                 @click="changeBtnStyle('plain')"
               >
                 <el-button plain>按钮</el-button>
               </li>
               <li
                 class="item"
-                :class="{'active': setting.style == 'primaryRound'}"
+                :class="{'active': setting.styleType == 'primaryRound'}"
                 @click="changeBtnStyle('primaryRound')"
               >
                 <el-button type="primary" round>按钮</el-button>
               </li>
               <li
                 class="item"
-                :class="{'active': setting.style == 'plainRound'}"
+                :class="{'active': setting.styleType == 'plainRound'}"
                 @click="changeBtnStyle('plainRound')"
               >
                 <el-button round>按钮</el-button>
@@ -210,7 +210,7 @@ export default {
       this.CHANGE_DESIGN_TEMPLATE(template);
     },
     changeBtnStyle(val) {
-      this.setting.style = val;
+      this.setting.styleType = val;
       this.changeHandle();
     },
     containerChange() {
@@ -234,7 +234,7 @@ export default {
       this.showLinkSelector = true;
     },
     submitLinkHandle(val) {
-      if (val.id) {
+      if (val) {
         let templateNormal = this.design.template[this.designEditID];
         let templateData = templateNormal.data;
         templateData[this.designEditIndex].setting.children[
